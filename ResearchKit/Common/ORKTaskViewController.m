@@ -270,7 +270,14 @@ static NSString *const _ChildNavigationControllerRestorationKey = @"childNavigat
     
     self.taskRunUUID = taskRunUUID;
     
-    [self.childNavigationController.navigationBar setShadowImage:[UIImage new]];
+    //[self.childNavigationController.navigationBar setShadowImage:[UIImage new]];
+    // Freshwork - Direct change in the Apple framework
+    
+    [self.childNavigationController.navigationBar setBarTintColor:[UIColor colorWithRed:0.00 green:0.42 blue:0.91 alpha:1.0]];
+    self.childNavigationController.navigationBar.tintColor = [UIColor whiteColor];
+    [self.childNavigationController.navigationBar setTitleTextAttributes:
+     @{NSForegroundColorAttributeName:[UIColor whiteColor]}];
+
     self.hairline = [self findHairlineViewUnder:self.childNavigationController.navigationBar];
     self.hairline.alpha = 0.0f;
     self.childNavigationController.toolbar.clipsToBounds = YES;
