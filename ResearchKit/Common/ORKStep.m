@@ -155,7 +155,7 @@
 }
 
 - (BOOL)allowsBackNavigation {
-    return YES;
+    return NO;
 }
 
 - (BOOL)isRestorable {
