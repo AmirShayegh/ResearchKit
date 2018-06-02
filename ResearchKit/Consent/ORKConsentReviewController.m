@@ -58,7 +58,7 @@
         _delegate = delegate;
         
         self.toolbarItems = @[
-                             [[UIBarButtonItem alloc] initWithTitle:ORKLocalizedString(@"BUTTON_DISAGREE", nil) style:UIBarButtonItemStylePlain target:self action:@selector(cancel)],
+                             [[UIBarButtonItem alloc] initWithTitle:ORKLocalizedString(@"BUTTON_DISAGREE", nil) style:UIBarButtonItemStylePlain target:self action:@selector(cancelWithConfirmation)],
                              [[UIBarButtonItem alloc] initWithBarButtonSystemItem:UIBarButtonSystemItemFlexibleSpace target:nil action:nil],
                              [[UIBarButtonItem alloc] initWithTitle:ORKLocalizedString(@"BUTTON_AGREE", nil) style:UIBarButtonItemStylePlain target:self action:@selector(ack)]];
     }
@@ -141,6 +141,22 @@
                                                                                       metrics:@{ @"horizMargin": @(horizontalMargin) }
                                                                         views:views]];
     [NSLayoutConstraint activateConstraints:_variableConstraints];
+}
+
+- (IBAction)cancelWithConfirmation {
+    UIAlertController *alert = [UIAlertController alertControllerWithTitle:ORKLocalizedString(@"CONSENT_REVIEW_CONFIRM_DISAGREE_ALERT_TITLE", nil)
+                                                                   message:ORKLocalizedString(@"CONSENT_REVIEW_CONFIRM_DISAGREE_ALERT_MESSAGE", nil)
+                                                            preferredStyle:UIAlertControllerStyleAlert];
+    
+    [alert addAction:[UIAlertAction actionWithTitle:ORKLocalizedString(@"BUTTON_CANCEL", nil) style:UIAlertActionStyleDefault handler:nil]];
+    [alert addAction:[UIAlertAction actionWithTitle:ORKLocalizedString(@"BUTTON_OK", nil) style:UIAlertActionStyleDefault handler:^(UIAlertAction *action) {
+        // Have to dispatch, so following transition animation works
+        dispatch_async(dispatch_get_main_queue(), ^{
+            [self cancel];
+        });
+    }]];
+    
+    [self presentViewController:alert animated:YES completion:nil];
 }
 
 - (IBAction)cancel {

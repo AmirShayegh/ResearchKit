@@ -561,3 +561,10 @@
 "AX_GRAPH_POINT_%@" = "Point: %@";
 
 "AX_AUDIO_BAR_GRAPH" = "Audio Bar Graph";
+
+
+/* Disagree Form */
+"CONSENT_REVIEW_CONFIRM_DISAGREE_ALERT_TITLE" = "Disagree";
+"CONSENT_REVIEW_CONFIRM_DISAGREE_ALERT_MESSAGE" = "Are you sure you disagree with the terms and conditions of this study? You will not be able to join it.";
+
+
