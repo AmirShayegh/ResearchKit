@@ -564,7 +564,7 @@
 
 
 /* Disagree Form */
-"CONSENT_REVIEW_CONFIRM_DISAGREE_ALERT_TITLE" = "Disagree";
-"CONSENT_REVIEW_CONFIRM_DISAGREE_ALERT_MESSAGE" = "Are you sure you disagree with the terms and conditions of this study? You will not be able to join it.";
+"CONSENT_REVIEW_CONFIRM_DISAGREE_ALERT_TITLE" = "Are you sure?";
+"CONSENT_REVIEW_CONFIRM_DISAGREE_ALERT_MESSAGE" = "In order to take part in the study, you must Agree to the Terms and Conditions of the study.";
 
 
