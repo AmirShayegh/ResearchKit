@@ -99,8 +99,9 @@
     
     _timerLabel = [[UILabel alloc] init];
     _timerLabel.textAlignment = NSTextAlignmentCenter;
-    
-    [self.view addSubview:_timerLabel];
+
+    // Hide Timer for activity
+    //[self.view addSubview:_timerLabel];
 }
 
 - (void)timerUpdated:(NSTimer*)timer {
