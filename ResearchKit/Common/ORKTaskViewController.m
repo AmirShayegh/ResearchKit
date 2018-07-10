@@ -965,7 +965,12 @@ static NSString *const _ChildNavigationControllerRestorationKey = @"childNavigat
     if ([self shouldDisplayProgressLabel]) {
         ORKTaskProgress progress = [_task progressOfCurrentStep:viewController.step withResult:[self result]];
         if (progress.total > 0) {
-            progressLabel = [NSString localizedStringWithFormat:ORKLocalizedString(@"STEP_PROGRESS_FORMAT", nil) ,ORKLocalizedStringFromNumber(@(progress.current+1)), ORKLocalizedStringFromNumber(@(progress.total))];
+            
+            //progressLabel = [NSString localizedStringWithFormat: ORKLocalizedString(@"STEP_PROGRESS_FORMAT", nil), ORKLocalizedStringFromNumber(@(progress.current+1)), ORKLocalizedStringFromNumber(@(progress.total))];
+            
+            // Freshworks. Changed in July 6, 2018
+            // Use percentage instead of steps
+            progressLabel = [NSString localizedStringWithFormat: ORKLocalizedString(@"STEP_PROGRESS_FORMAT_PERCENTAGE", nil), ORKLocalizedStringFromNumber(@((int)(((double)(progress.current+1)/(double)progress.total)*100)))];
         }
     }
     
