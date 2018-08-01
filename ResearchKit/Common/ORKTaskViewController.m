@@ -973,7 +973,7 @@ static NSString *const _ChildNavigationControllerRestorationKey = @"childNavigat
             if (progress.current == 0) {
                 progressLabel = [NSString localizedStringWithFormat: ORKLocalizedString(@"STEP_PROGRESS_FORMAT_PERCENTAGE", nil), ORKLocalizedStringFromNumber(@(0))];
             } else {
-                progressLabel = [NSString localizedStringWithFormat: ORKLocalizedString(@"STEP_PROGRESS_FORMAT_PERCENTAGE", nil), ORKLocalizedStringFromNumber(@((int)(((double)(progress.current+1)/(double)progress.total)*100)))];
+                progressLabel = [NSString localizedStringWithFormat: ORKLocalizedString(@"STEP_PROGRESS_FORMAT_PERCENTAGE", nil), ORKLocalizedStringFromNumber(@((int)(((double)(progress.current)/((double)progress.total-1.0))*100)))];
             }
         }
     }
