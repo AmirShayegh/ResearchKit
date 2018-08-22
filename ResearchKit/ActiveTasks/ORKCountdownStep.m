@@ -55,7 +55,7 @@
     
     [super validateParameters];
     
-    NSTimeInterval const ORKCountdownStepMinimumDuration = 3.0;
+    NSTimeInterval const ORKCountdownStepMinimumDuration = 1.0;
     
     if ( self.stepDuration < ORKCountdownStepMinimumDuration) {
         @throw [NSException exceptionWithName:NSInvalidArgumentException reason:[NSString stringWithFormat:@"duration cannot be shorter than %@ seconds.", @(ORKCountdownStepMinimumDuration)]  userInfo:nil];

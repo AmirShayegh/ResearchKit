@@ -107,8 +107,10 @@ ORK_CLASS_AVAILABLE
  In some cases, it can be useful to link the step identifier to a unique identifier in a
  database; in other cases, it can make sense to make the identifier human
  readable.
+ 
+ FW Change: Allow identifiers to be changed later.
  */
-@property (nonatomic, copy, readonly) NSString *identifier;
+@property (nonatomic, copy) NSString *identifier;
 
 /**
  A Boolean value indicating whether a task can be restored to the step
