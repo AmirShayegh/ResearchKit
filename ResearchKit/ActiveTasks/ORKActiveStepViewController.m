@@ -55,7 +55,7 @@
 
 
 @interface ORKActiveStepViewController () {
-    ORKActiveStepView *_activeStepView;
+    //ORKActiveStepView *_activeStepView;
     ORKActiveStepTimer *_activeStepTimer;
 
     NSArray *_recorderResults;

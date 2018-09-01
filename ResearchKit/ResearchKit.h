@@ -81,6 +81,18 @@
 
 #import <ResearchKit/ORKStepViewController.h>
 #import <ResearchKit/ORKActiveStepViewController.h>
+
+/**
+ Exposed
+ */
+#import <ResearchKit/ORKActiveStepViewController_Internal.h>
+#import <ResearchKit/ORKCustomStepView_Internal.h>
+#import <ResearchKit/ORKActiveStepView.h>
+#import <ResearchKit/ORKVerticalContainerView.h>
+#import <ResearchKit/ORKNavigationContainerView.h>
+#import <ResearchKit/ORKStepHeaderView.h>
+#import <ResearchKit/ORKActiveStep_Internal.h>
+
 #import <ResearchKit/ORKCompletionStepViewController.h>
 #import <ResearchKit/ORKFormStepViewController.h>
 #import <ResearchKit/ORKInstructionStepViewController.h>

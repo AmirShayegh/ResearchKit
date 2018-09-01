@@ -31,7 +31,7 @@
 
 #import "ORKNavigationContainerView.h"
 #import "ORKContinueButton.h"
-#import "ORKTextButton_Internal.h"
+//#import "ORKTextButton_Internal.h"
 #import "ORKFootnoteLabel.h"
 
 

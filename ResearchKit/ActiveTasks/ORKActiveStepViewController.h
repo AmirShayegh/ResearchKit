@@ -32,6 +32,7 @@
 @import UIKit;
 #import <ResearchKit/ORKStepViewController.h>
 #import <ResearchKit/ORKRecorder.h>
+#import <ResearchKit/ORKActiveStepView.h>
 
 
 NS_ASSUME_NONNULL_BEGIN
@@ -253,6 +254,17 @@ ORK_CLASS_AVAILABLE
  Subclasses may override this method, but must also call super.
  */
 - (void)prepareStep;
+
+
+/**
+ 
+ */
+
+@property (nonatomic, strong, nullable) ORKActiveStepView *activeStepView;
+//@property (nonatomic, strong, readonly, nullable) ORKActiveStepView *activeStepView;
+
+//- (ORKActiveStepView *)activeStepView;
+
 
 @end
 
