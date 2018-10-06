@@ -36,6 +36,7 @@ NS_ASSUME_NONNULL_BEGIN
 
 @class ORKActiveStepViewController;
 
+ORK_CLASS_AVAILABLE
 @interface ORKActiveStepCustomView : UIView
 
 @property (nonatomic, weak, nullable) ORKActiveStepViewController *activeStepViewController;
