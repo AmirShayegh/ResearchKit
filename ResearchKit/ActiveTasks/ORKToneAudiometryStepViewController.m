@@ -42,8 +42,9 @@
 #import "ORKCollectionResult_Private.h"
 #import "ORKToneAudiometryResult.h"
 #import "ORKToneAudiometryStep.h"
-
+#import "ORKStepContainerView_Private.h"
 #import "ORKHelpers_Internal.h"
+#import "ORKNavigationContainerView_Internal.h"
 
 #import <MediaPlayer/MediaPlayer.h>
 
@@ -95,11 +96,19 @@
     [self generateFrequencyCombination];
     self.toneAudiometryContentView = [[ORKToneAudiometryContentView alloc] init];
     self.activeStepView.activeCustomView = self.toneAudiometryContentView;
+    self.activeStepView.customContentFillsAvailableSpace = YES;
     
     [self.toneAudiometryContentView.leftButton addTarget:self action:@selector(buttonPressed:forEvent:) forControlEvents:UIControlEventTouchDown];
     [self.toneAudiometryContentView.rightButton addTarget:self action:@selector(buttonPressed:forEvent:) forControlEvents:UIControlEventTouchDown];
     self.currentTestIndex = 0;
     self.audioGenerator = [ORKAudioGenerator new];
+    
+    if (UIAccessibilityIsVoiceOverRunning() && !self.toneAudiometryStep.practiceStep) {
+        // Make it possible to tap the buttons as quickly as possible.
+        self.toneAudiometryContentView.isAccessibilityElement = YES;
+        self.toneAudiometryContentView.accessibilityLabel = ORKLocalizedString(@"AX_TAP_BUTTON_DIRECT_TOUCH_AREA", nil);
+        self.toneAudiometryContentView.accessibilityTraits = UIAccessibilityTraitAllowsDirectInteraction;
+    }
 }
 
 - (void)generateFrequencyCombination {
@@ -119,6 +128,11 @@
     [super viewDidAppear:animated];
     
     [self start];
+    
+    if (UIAccessibilityIsVoiceOverRunning() && !self.toneAudiometryStep.practiceStep) {
+        // Put focus on the buttons immediately so that the first tap gets registered instead of just moving focus
+        UIAccessibilityPostNotification(UIAccessibilityLayoutChangedNotification, self.toneAudiometryContentView);
+    }
 }
 
 - (void)viewWillDisappear:(BOOL)animated {

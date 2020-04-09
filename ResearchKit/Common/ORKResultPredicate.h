@@ -209,7 +209,6 @@ ORK_CLASS_AVAILABLE
 + (instancetype)new NS_UNAVAILABLE;
 - (instancetype)init NS_UNAVAILABLE;
 
-
 /**
  Returns a predicate matching a result of the kind `ORKQuestionResult` whose answer is `nil`.
 
@@ -236,6 +235,7 @@ ORK_CLASS_AVAILABLE
  
  @return A result predicate.
  */
+
 + (NSPredicate *)predicateForNilQuestionResultWithResultSelector:(ORKResultSelector *)resultSelector;
 
 /**
