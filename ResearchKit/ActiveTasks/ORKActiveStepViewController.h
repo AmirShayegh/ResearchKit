@@ -255,16 +255,7 @@ ORK_CLASS_AVAILABLE
  */
 - (void)prepareStep;
 
-
-/**
- 
- */
-
 @property (nonatomic, strong, nullable) ORKActiveStepView *activeStepView;
-//@property (nonatomic, strong, readonly, nullable) ORKActiveStepView *activeStepView;
-
-//- (ORKActiveStepView *)activeStepView;
-
 
 @end
 

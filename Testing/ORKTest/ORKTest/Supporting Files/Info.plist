@@ -24,6 +24,8 @@
 	<true/>
 	<key>NSCameraUsageDescription</key>
 	<string>Test Camera related features.</string>
+	<key>NSFaceIDUsageDescription</key>
+	<string>This app uses Face ID.</string>
 	<key>NSHealthShareUsageDescription</key>
 	<string>Test HK releated features.</string>
 	<key>NSHealthUpdateUsageDescription</key>
@@ -48,9 +50,6 @@
 	<key>UISupportedInterfaceOrientations</key>
 	<array>
 		<string>UIInterfaceOrientationPortrait</string>
-		<string>UIInterfaceOrientationLandscapeLeft</string>
-		<string>UIInterfaceOrientationLandscapeRight</string>
-		<string>UIInterfaceOrientationPortraitUpsideDown</string>
 	</array>
 </dict>
 </plist>
