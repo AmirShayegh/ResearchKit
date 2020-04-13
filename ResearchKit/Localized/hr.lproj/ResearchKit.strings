@@ -33,6 +33,7 @@
 "CONSENT_NAME_GIVEN" = "Ime";
 "CONSENT_NAME_FAMILY" = "Prezime";
 "CONSENT_NAME_PLACEHOLDER" = "Potrebno";
+"CONSENT_NAME_SECTION_TITLE" = "";
 "CONSENT_REVIEW_TITLE" = "Pregled informacija";
 "CONSENT_REVIEW_INSTRUCTION" = "Pregledajte obrazac u nastavku te dodirnite Slažem se ako ste spremni nastaviti.";
 "CONSENT_REVIEW_ALERT_TITLE" = "Pregled informacija";

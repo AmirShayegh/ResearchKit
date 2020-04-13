@@ -33,6 +33,7 @@
 "CONSENT_NAME_GIVEN" = "الاسم الأول";
 "CONSENT_NAME_FAMILY" = "اسم العائلة";
 "CONSENT_NAME_PLACEHOLDER" = "مطلوب";
+"CONSENT_NAME_SECTION_TITLE" = "";
 "CONSENT_REVIEW_TITLE" = "مراجعة";
 "CONSENT_REVIEW_INSTRUCTION" = "راجع النموذج أدناه، واضغط على موافقة إذا كنت مستعدًا للمتابعة.";
 "CONSENT_REVIEW_ALERT_TITLE" = "مراجعة";

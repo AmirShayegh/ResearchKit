@@ -33,6 +33,7 @@
 "CONSENT_NAME_GIVEN" = "שם פרטי";
 "CONSENT_NAME_FAMILY" = "שם משפחה";
 "CONSENT_NAME_PLACEHOLDER" = "חובה";
+"CONSENT_NAME_SECTION_TITLE" = "";
 "CONSENT_REVIEW_TITLE" = "נא לקרוא בעיון";
 "CONSENT_REVIEW_INSTRUCTION" = "יש לעיין בטופס הבא ולהקיש על ״אני מסכים/ה״ כדי להמשיך.";
 "CONSENT_REVIEW_ALERT_TITLE" = "נא לקרוא בעיון";

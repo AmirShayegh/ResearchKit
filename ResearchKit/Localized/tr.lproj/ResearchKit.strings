@@ -33,6 +33,7 @@
 "CONSENT_NAME_GIVEN" = "Ad";
 "CONSENT_NAME_FAMILY" = "Soyad";
 "CONSENT_NAME_PLACEHOLDER" = "Gerekli";
+"CONSENT_NAME_SECTION_TITLE" = "";
 "CONSENT_REVIEW_TITLE" = "Gözden Geçir";
 "CONSENT_REVIEW_INSTRUCTION" = "Aşağıdaki formu gözden geçirin, sürdürmeye hazırsanız Kabul Ediyorum’a dokunun.";
 "CONSENT_REVIEW_ALERT_TITLE" = "Gözden Geçir";

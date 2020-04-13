@@ -33,6 +33,7 @@
 "CONSENT_NAME_GIVEN" = "Prenume";
 "CONSENT_NAME_FAMILY" = "Nume de familie";
 "CONSENT_NAME_PLACEHOLDER" = "Obligatoriu";
+"CONSENT_NAME_SECTION_TITLE" = "";
 "CONSENT_REVIEW_TITLE" = "Revizuire";
 "CONSENT_REVIEW_INSTRUCTION" = "Revizuiți formularul de mai jos și apăsați pe “De acord” dacă sunteți gata să continuați.";
 "CONSENT_REVIEW_ALERT_TITLE" = "Revizuiți";

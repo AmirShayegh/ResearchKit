@@ -33,6 +33,7 @@
 "CONSENT_NAME_GIVEN" = "ชื่อ";
 "CONSENT_NAME_FAMILY" = "นามสกุล";
 "CONSENT_NAME_PLACEHOLDER" = "บังคับ";
+"CONSENT_NAME_SECTION_TITLE" = "";
 "CONSENT_REVIEW_TITLE" = "ตรวจทาน";
 "CONSENT_REVIEW_INSTRUCTION" = "ตรวจทานแบบฟอร์มด้านล่างแล้วแตะยอมรับหากคุณพร้อมดำเนินการต่อ";
 "CONSENT_REVIEW_ALERT_TITLE" = "ตรวจทาน";

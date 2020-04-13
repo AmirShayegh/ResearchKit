@@ -33,6 +33,7 @@
 "CONSENT_NAME_GIVEN" = "Nome";
 "CONSENT_NAME_FAMILY" = "Sobrenome";
 "CONSENT_NAME_PLACEHOLDER" = "Obrigatório";
+"CONSENT_NAME_SECTION_TITLE" = "";
 "CONSENT_REVIEW_TITLE" = "Revisar";
 "CONSENT_REVIEW_INSTRUCTION" = "Analise o formulário abaixo e toque em Concordar se estiver pronto para continuar.";
 "CONSENT_REVIEW_ALERT_TITLE" = "Revisar";

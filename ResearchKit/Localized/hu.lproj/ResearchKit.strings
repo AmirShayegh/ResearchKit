@@ -33,6 +33,7 @@
 "CONSENT_NAME_GIVEN" = "Utónév";
 "CONSENT_NAME_FAMILY" = "Családi név";
 "CONSENT_NAME_PLACEHOLDER" = "Szükséges";
+"CONSENT_NAME_SECTION_TITLE" = "";
 "CONSENT_REVIEW_TITLE" = "Áttekintés";
 "CONSENT_REVIEW_INSTRUCTION" = "Tekintse át az alábbi űrlapot, majd koppintson az Elfogadom gombra, ha készen áll a folytatásra.";
 "CONSENT_REVIEW_ALERT_TITLE" = "Áttekintés";

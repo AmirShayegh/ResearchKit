@@ -33,6 +33,7 @@
 "CONSENT_NAME_GIVEN" = "Nama Pertama";
 "CONSENT_NAME_FAMILY" = "Nama Akhir";
 "CONSENT_NAME_PLACEHOLDER" = "Diperlukan";
+"CONSENT_NAME_SECTION_TITLE" = "";
 "CONSENT_REVIEW_TITLE" = "Semak";
 "CONSENT_REVIEW_INSTRUCTION" = "Semak borang di bawah dan ketik Setuju jika anda bersedia untuk meneruskan.";
 "CONSENT_REVIEW_ALERT_TITLE" = "Semak";

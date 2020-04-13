@@ -33,6 +33,7 @@
 "CONSENT_NAME_GIVEN" = "प्रथम नाम";
 "CONSENT_NAME_FAMILY" = "उपनाम";
 "CONSENT_NAME_PLACEHOLDER" = "आवश्यक";
+"CONSENT_NAME_SECTION_TITLE" = "";
 "CONSENT_REVIEW_TITLE" = "समीक्षा";
 "CONSENT_REVIEW_INSTRUCTION" = "नीचे दिए गए फ़ॉर्म को देखें और जारी रखने के लिए “सहमत” पर टैप करें।";
 "CONSENT_REVIEW_ALERT_TITLE" = "समीक्षा";

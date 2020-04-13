@@ -33,6 +33,7 @@
 "CONSENT_NAME_GIVEN" = "Имя";
 "CONSENT_NAME_FAMILY" = "Фамилия";
 "CONSENT_NAME_PLACEHOLDER" = "Обязательно";
+"CONSENT_NAME_SECTION_TITLE" = "";
 "CONSENT_REVIEW_TITLE" = "Проверка";
 "CONSENT_REVIEW_INSTRUCTION" = "Проверьте приведенную ниже форму и коснитесь «Принимаю», если Вы готовы продолжить.";
 "CONSENT_REVIEW_ALERT_TITLE" = "Проверка";

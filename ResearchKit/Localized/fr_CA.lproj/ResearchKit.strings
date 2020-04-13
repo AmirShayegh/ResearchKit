@@ -33,6 +33,7 @@
 "CONSENT_NAME_GIVEN" = "Prénom";
 "CONSENT_NAME_FAMILY" = "Nom de famille";
 "CONSENT_NAME_PLACEHOLDER" = "Requis";
+"CONSENT_NAME_SECTION_TITLE" = "";
 "CONSENT_REVIEW_TITLE" = "Révision";
 "CONSENT_REVIEW_INSTRUCTION" = "Consultez le formulaire ci-dessous et touchez Accepter si vous êtes prêt à continuer.";
 "CONSENT_REVIEW_ALERT_TITLE" = "Révision";

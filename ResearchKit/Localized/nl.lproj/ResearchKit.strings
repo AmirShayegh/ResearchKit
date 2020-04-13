@@ -33,6 +33,7 @@
 "CONSENT_NAME_GIVEN" = "Voornaam";
 "CONSENT_NAME_FAMILY" = "Achternaam";
 "CONSENT_NAME_PLACEHOLDER" = "Vereist";
+"CONSENT_NAME_SECTION_TITLE" = "";
 "CONSENT_REVIEW_TITLE" = "Bekijk";
 "CONSENT_REVIEW_INSTRUCTION" = "Lees het formulier hieronder door en tik op 'Akkoord' als je klaar bent om verder te gaan.";
 "CONSENT_REVIEW_ALERT_TITLE" = "Bekijk";

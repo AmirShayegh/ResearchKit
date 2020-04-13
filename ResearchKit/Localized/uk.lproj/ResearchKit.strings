@@ -33,6 +33,7 @@
 "CONSENT_NAME_GIVEN" = "Ім’я";
 "CONSENT_NAME_FAMILY" = "Прізвище";
 "CONSENT_NAME_PLACEHOLDER" = "Обов’язково";
+"CONSENT_NAME_SECTION_TITLE" = "";
 "CONSENT_REVIEW_TITLE" = "Огляд";
 "CONSENT_REVIEW_INSTRUCTION" = "Перегляньте подану нижче форму і торкніть «Погоджуюсь», якщо ви готові продовжити.";
 "CONSENT_REVIEW_ALERT_TITLE" = "Огляд";

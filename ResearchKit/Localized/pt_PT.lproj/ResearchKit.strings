@@ -33,6 +33,7 @@
 "CONSENT_NAME_GIVEN" = "Nome";
 "CONSENT_NAME_FAMILY" = "Apelido";
 "CONSENT_NAME_PLACEHOLDER" = "necessário";
+"CONSENT_NAME_SECTION_TITLE" = "";
 "CONSENT_REVIEW_TITLE" = "Leia com atenção";
 "CONSENT_REVIEW_INSTRUCTION" = "Leia com atenção o texto abaixo e toque em Concordo se pretende continuar.";
 "CONSENT_REVIEW_ALERT_TITLE" = "Leia com atenção";

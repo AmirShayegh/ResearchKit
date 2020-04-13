@@ -33,6 +33,7 @@
 "CONSENT_NAME_GIVEN" = "Nom";
 "CONSENT_NAME_FAMILY" = "Cognoms";
 "CONSENT_NAME_PLACEHOLDER" = "Obligatori";
+"CONSENT_NAME_SECTION_TITLE" = "";
 "CONSENT_REVIEW_TITLE" = "Revisió";
 "CONSENT_REVIEW_INSTRUCTION" = "Repassa el formulari de sota i toca Acceptar si estàs a punt per continuar.";
 "CONSENT_REVIEW_ALERT_TITLE" = "Revisió";

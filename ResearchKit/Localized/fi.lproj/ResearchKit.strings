@@ -33,6 +33,7 @@
 "CONSENT_NAME_GIVEN" = "Etunimi";
 "CONSENT_NAME_FAMILY" = "Sukunimi";
 "CONSENT_NAME_PLACEHOLDER" = "Vaaditaan";
+"CONSENT_NAME_SECTION_TITLE" = "";
 "CONSENT_REVIEW_TITLE" = "Tarkasta";
 "CONSENT_REVIEW_INSTRUCTION" = "Tarkasta alla oleva lomake ja napauta ”Hyväksy”, jos olet valmis jatkamaan.";
 "CONSENT_REVIEW_ALERT_TITLE" = "Tarkasta";

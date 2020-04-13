@@ -33,6 +33,7 @@
 "CONSENT_NAME_GIVEN" = "Jméno";
 "CONSENT_NAME_FAMILY" = "Příjmení";
 "CONSENT_NAME_PLACEHOLDER" = "Požadováno";
+"CONSENT_NAME_SECTION_TITLE" = "";
 "CONSENT_REVIEW_TITLE" = "Kontrola";
 "CONSENT_REVIEW_INSTRUCTION" = "Projděte si formulář níže, a až budete připraveni pokračovat, klepněte na Souhlasím.";
 "CONSENT_REVIEW_ALERT_TITLE" = "Kontrola";

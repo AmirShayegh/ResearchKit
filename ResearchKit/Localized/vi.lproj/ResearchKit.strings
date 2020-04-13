@@ -33,6 +33,7 @@
 "CONSENT_NAME_GIVEN" = "Tên";
 "CONSENT_NAME_FAMILY" = "Họ";
 "CONSENT_NAME_PLACEHOLDER" = "Bắt buộc";
+"CONSENT_NAME_SECTION_TITLE" = "";
 "CONSENT_REVIEW_TITLE" = "Xem lại";
 "CONSENT_REVIEW_INSTRUCTION" = "Hãy xem xét biểu mẫu bên dưới và chạm vào Đồng ý nếu bạn sẵn sàng tiếp tục.";
 "CONSENT_REVIEW_ALERT_TITLE" = "Xem lại";

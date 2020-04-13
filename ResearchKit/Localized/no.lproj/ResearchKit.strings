@@ -33,6 +33,7 @@
 "CONSENT_NAME_GIVEN" = "Fornavn";
 "CONSENT_NAME_FAMILY" = "Etternavn";
 "CONSENT_NAME_PLACEHOLDER" = "Kreves";
+"CONSENT_NAME_SECTION_TITLE" = "";
 "CONSENT_REVIEW_TITLE" = "Se gjennom";
 "CONSENT_REVIEW_INSTRUCTION" = "Se gjennom skjemaet nedenfor, og trykk på Enig hvis du er klar til å fortsette.";
 "CONSENT_REVIEW_ALERT_TITLE" = "Se gjennom";

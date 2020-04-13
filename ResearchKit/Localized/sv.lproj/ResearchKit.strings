@@ -33,6 +33,7 @@
 "CONSENT_NAME_GIVEN" = "Förnamn";
 "CONSENT_NAME_FAMILY" = "Efternamn";
 "CONSENT_NAME_PLACEHOLDER" = "Krävs";
+"CONSENT_NAME_SECTION_TITLE" = "";
 "CONSENT_REVIEW_TITLE" = "Granska";
 "CONSENT_REVIEW_INSTRUCTION" = "Granska formuläret nedan och tryck på Godkänn om du vill fortsätta.";
 "CONSENT_REVIEW_ALERT_TITLE" = "Granska";
