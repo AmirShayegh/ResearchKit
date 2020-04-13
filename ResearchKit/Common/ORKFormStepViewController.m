@@ -563,7 +563,7 @@ static const CGFloat DelayBeforeAutoScroll = 0.25;
             
             if (ORKNeedWideScreenDesign(self.view)) {
                 [_tableView setBackgroundColor:[UIColor clearColor]];
-                [self.taskViewController.navigationBar setBarTintColor:ORKColor(ORKBackgroundColorKey)];
+                [self.taskViewController.navigationBar setBarTintColor:[UIColor colorWithRed:0.00 green:0.42 blue:0.91 alpha:1.0]];
                 [self.view setBackgroundColor:ORKColor(ORKBackgroundColorKey)];
             }
             else {

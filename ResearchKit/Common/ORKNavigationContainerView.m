@@ -84,11 +84,11 @@ static const CGFloat activityIndicatorPadding = 24.0;
     if (!effectView && !_removeVisualEffect) {
         self.backgroundColor = [UIColor clearColor];
         UIVisualEffect *blurEffect;
-        if (@available(iOS 13.0, *)) {
-            blurEffect = [UIBlurEffect effectWithStyle:UIBlurEffectStyleSystemChromeMaterial];
-        } else {
-            blurEffect = [UIBlurEffect effectWithStyle:UIBlurEffectStyleLight];
-        }
+//        if (@available(iOS 13.0, *)) {
+//            blurEffect = [UIBlurEffect effectWithStyle:UIBlurEffectStyleSystemChromeMaterial];
+//        } else {
+//            blurEffect = [UIBlurEffect effectWithStyle:UIBlurEffectStyleLight];
+//        }
         effectView = [[UIVisualEffectView alloc] initWithEffect:blurEffect];
     }
     effectView.translatesAutoresizingMaskIntoConstraints = NO;

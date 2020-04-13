@@ -201,7 +201,7 @@
     [_pageViewController didMoveToParentViewController:self];
     
     if (self.taskViewController.navigationBar) {
-        [self.taskViewController.navigationBar setBarTintColor:self.view.backgroundColor];
+        [self.taskViewController.navigationBar setBarTintColor:[UIColor colorWithRed:0.00 green:0.42 blue:0.91 alpha:1.0]];
     }
     _animationView.userInteractionEnabled = NO;
     
