@@ -57,7 +57,6 @@
                                              selector:@selector(updateAppearance)
                                                  name:UIContentSizeCategoryDidChangeNotification
                                                object:nil];
-    self.font = [[self class] defaultFont];
     [self updateAppearance];
 }
 
@@ -67,6 +66,7 @@
 }
 
 - (void)updateAppearance {
+    self.font = [[self class] defaultFont];
     [self invalidateIntrinsicContentSize];
 }
 

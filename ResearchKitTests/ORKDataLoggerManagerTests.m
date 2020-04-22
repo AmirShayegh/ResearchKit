@@ -220,9 +220,7 @@
     XCTAssertTrue([dm2 append:@{@"test":@"blah"} error:nil]);
     XCTAssertTrue([dm1 append:@{@"test":@"blah"} error:nil]);
     [dm3 finishCurrentLog];
-    [[NSRunLoop mainRunLoop] runUntilDate:[NSDate dateWithTimeIntervalSinceNow:0.2]];
     [dm2 finishCurrentLog];
-    [[NSRunLoop mainRunLoop] runUntilDate:[NSDate dateWithTimeIntervalSinceNow:0.2]];
     [dm1 finishCurrentLog];
     [[NSRunLoop mainRunLoop] runUntilDate:[NSDate dateWithTimeIntervalSinceNow:0.2]];
     

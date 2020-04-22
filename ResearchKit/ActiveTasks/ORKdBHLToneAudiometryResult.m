@@ -34,7 +34,6 @@
 #import "ORKResult_Private.h"
 #import "ORKHelpers_Internal.h"
 
-const double ORKInvalidDBHLValue = DBL_MAX;
 
 @implementation ORKdBHLToneAudiometryResult
 

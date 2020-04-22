@@ -49,36 +49,36 @@ static NSString *ORKKeychainWrapperDefaultService() {
 
 + (BOOL)setObject:(id<NSSecureCoding>)object
            forKey:(NSString *)key
-            error:(NSError **)errorOut {
+            error:(NSError **)error {
     NSData *data = [NSKeyedArchiver archivedDataWithRootObject:object];
     return [self setData:data
                   forKey:key
                  service:ORKKeychainWrapperDefaultService()
              accessGroup:nil
-                   error:errorOut];
+                   error:error];
 }
 
 + (id<NSSecureCoding>)objectForKey:(NSString *)key
-             error:(NSError **)errorOut {
+             error:(NSError **)error {
     NSData *data = [self dataForKey:key
                             service:ORKKeychainWrapperDefaultService()
                         accessGroup:nil
-                              error:errorOut];
+                              error:error];
     return data ? [NSKeyedUnarchiver unarchiveObjectWithData:data] : nil;
 }
 
 + (BOOL)removeObjectForKey:(NSString *)key
-                     error:(NSError **)errorOut {
+                     error:(NSError **)error {
     return [self removeItemForKey:key
                           service:ORKKeychainWrapperDefaultService()
                       accessGroup:nil
-                            error:errorOut];
+                            error:error];
 }
 
-+ (BOOL)resetKeychainWithError:(NSError **)errorOut {
++ (BOOL)resetKeychainWithError:(NSError **)error {
     return [self removeAllItemsForService:ORKKeychainWrapperDefaultService()
                               accessGroup:nil
-                                    error:errorOut];
+                                    error:error];
 }
 
 #pragma mark - Private Methods
@@ -86,7 +86,7 @@ static NSString *ORKKeychainWrapperDefaultService() {
 + (NSData *)dataForKey:(NSString *)key
                service:(NSString *)service
            accessGroup:(NSString *)accessGroup
-                 error:(NSError **)errorOut {
+                 error:(NSError **)error {
     NSData *returnValue = nil;
     if (key) {
         if (!service) {
@@ -108,10 +108,10 @@ static NSString *ORKKeychainWrapperDefaultService() {
         CFTypeRef data = nil;
         OSStatus status = SecItemCopyMatching((__bridge CFDictionaryRef)query, &data);
         if (status != errSecSuccess) {
-            if (errorOut != NULL) {
-                *errorOut = [NSError errorWithDomain:NSOSStatusErrorDomain
-                                                code:status
-                                            userInfo:@{NSLocalizedDescriptionKey: ORKLocalizedString(@"KEYCHAIN_FIND_ERROR_MESSAGE", nil)}];
+            if (error) {
+                *error = [NSError errorWithDomain:NSOSStatusErrorDomain
+                                             code:status
+                                         userInfo:@{NSLocalizedDescriptionKey: ORKLocalizedString(@"KEYCHAIN_FIND_ERROR_MESSAGE", nil)}];
             }
         } else {
             returnValue = [NSData dataWithData:(__bridge NSData *)data];
@@ -127,7 +127,7 @@ static NSString *ORKKeychainWrapperDefaultService() {
          forKey:(NSString *)key
         service:(NSString *)service
     accessGroup:(NSString *)accessGroup
-          error:(NSError **)errorOut {
+          error:(NSError **)error {
     BOOL returnValue = YES;
     if (key) {
         if (!service) {
@@ -152,15 +152,15 @@ static NSString *ORKKeychainWrapperDefaultService() {
                 
                 status = SecItemUpdate((__bridge CFDictionaryRef)query, (__bridge CFDictionaryRef)attributesToUpdate);
                 if (status != errSecSuccess) {
-                    if (errorOut != NULL) {
-                        *errorOut = [NSError errorWithDomain:NSOSStatusErrorDomain
-                                                        code:status
-                                                    userInfo:@{NSLocalizedDescriptionKey: ORKLocalizedString(@"KEYCHAIN_UPDATE_ERROR_MESSAGE", nil)}];
+                    if (error) {
+                        *error = [NSError errorWithDomain:NSOSStatusErrorDomain
+                                                     code:status
+                                                 userInfo:@{NSLocalizedDescriptionKey: ORKLocalizedString(@"KEYCHAIN_UPDATE_ERROR_MESSAGE", nil)}];
                     }
                     returnValue = NO;
                 }
             } else {
-                [self removeItemForKey:key service:service accessGroup:accessGroup error:errorOut];
+                [self removeItemForKey:key service:service accessGroup:accessGroup error:error];
             }
         } else if (status == errSecItemNotFound) {
             NSMutableDictionary *attributes = [[NSMutableDictionary alloc] init];
@@ -179,10 +179,10 @@ static NSString *ORKKeychainWrapperDefaultService() {
             
             status = SecItemAdd((__bridge CFDictionaryRef)attributes, NULL);
             if (status != errSecSuccess) {
-                if (errorOut != NULL) {
-                    *errorOut = [NSError errorWithDomain:NSOSStatusErrorDomain
-                                                    code:status
-                                                userInfo:@{NSLocalizedDescriptionKey: ORKLocalizedString(@"KEYCHAIN_ADD_ERROR_MESSAGE", nil)}];
+                if (error) {
+                    *error = [NSError errorWithDomain:NSOSStatusErrorDomain
+                                                 code:status
+                                             userInfo:@{NSLocalizedDescriptionKey: ORKLocalizedString(@"KEYCHAIN_ADD_ERROR_MESSAGE", nil)}];
                 }
                 returnValue = NO;
             }
@@ -196,7 +196,7 @@ static NSString *ORKKeychainWrapperDefaultService() {
 + (BOOL)removeItemForKey:(NSString *)key
                  service:(NSString *)service
              accessGroup:(NSString *)accessGroup
-                   error:(NSError **)errorOut {
+                   error:(NSError **)error {
     BOOL returnValue = NO;
     if (key) {
         if (!service) {
@@ -215,10 +215,10 @@ static NSString *ORKKeychainWrapperDefaultService() {
         
         OSStatus status = SecItemDelete((__bridge CFDictionaryRef)itemToDelete);
         if (status != errSecSuccess && status != errSecItemNotFound) {
-            if (errorOut != NULL) {
-                *errorOut = [NSError errorWithDomain:NSOSStatusErrorDomain
-                                                code:status
-                                            userInfo:@{NSLocalizedDescriptionKey: ORKLocalizedString(@"KEYCHAIN_DELETE_ERROR_MESSAGE", nil)}];
+            if (error) {
+                *error = [NSError errorWithDomain:NSOSStatusErrorDomain
+                                             code:status
+                                         userInfo:@{NSLocalizedDescriptionKey: ORKLocalizedString(@"KEYCHAIN_DELETE_ERROR_MESSAGE", nil)}];
             }
             returnValue = NO;
         } else {
@@ -230,8 +230,8 @@ static NSString *ORKKeychainWrapperDefaultService() {
 
 + (BOOL)removeAllItemsForService:(NSString *)service
                      accessGroup:(NSString *)accessGroup
-                           error:(NSError **)errorOut {
-    NSArray *items = [self itemsForService:service accessGroup:accessGroup error:errorOut];
+                           error:(NSError **)error {
+    NSArray *items = [self itemsForService:service accessGroup:accessGroup error:error];
     BOOL returnValue = NO;
     
     if ([items count] > 0) {
@@ -241,10 +241,10 @@ static NSString *ORKKeychainWrapperDefaultService() {
             
             OSStatus status = SecItemDelete((__bridge CFDictionaryRef)itemToDelete);
             if (status != errSecSuccess) {
-                if (errorOut != NULL) {
-                    *errorOut = [NSError errorWithDomain:NSOSStatusErrorDomain
-                                                    code:status
-                                                userInfo:@{NSLocalizedDescriptionKey: ORKLocalizedString(@"KEYCHAIN_DELETE_ERROR_MESSAGE", nil)}];
+                if (error) {
+                    *error = [NSError errorWithDomain:NSOSStatusErrorDomain
+                                                 code:status
+                                             userInfo:@{NSLocalizedDescriptionKey: ORKLocalizedString(@"KEYCHAIN_DELETE_ERROR_MESSAGE", nil)}];
                 }
                 returnValue = NO;
             } else {
@@ -260,7 +260,7 @@ static NSString *ORKKeychainWrapperDefaultService() {
 
 + (NSArray *)itemsForService:(NSString *)service
                  accessGroup:(NSString *)accessGroup
-                       error:(NSError **)errorOut {
+                       error:(NSError **)error {
     if (!service) {
         service = ORKKeychainWrapperDefaultService();
     }
@@ -283,10 +283,10 @@ static NSString *ORKKeychainWrapperDefaultService() {
     if (status == errSecSuccess || status == errSecItemNotFound) {
         returnValue =  (__bridge NSArray *)(result);
     } else {
-        if (errorOut != NULL) {
-            *errorOut = [NSError errorWithDomain:NSOSStatusErrorDomain
-                                            code:status
-                                        userInfo:@{NSLocalizedDescriptionKey: ORKLocalizedString(@"KEYCHAIN_FIND_ERROR_MESSAGE", nil)}];
+        if (error) {
+            *error = [NSError errorWithDomain:NSOSStatusErrorDomain
+                                         code:status
+                                     userInfo:@{NSLocalizedDescriptionKey: ORKLocalizedString(@"KEYCHAIN_FIND_ERROR_MESSAGE", nil)}];
         }
         returnValue = nil;
     }

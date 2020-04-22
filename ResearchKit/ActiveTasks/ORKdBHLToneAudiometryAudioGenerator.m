@@ -84,12 +84,13 @@
 
 const double ORKdBHLSineWaveToneGeneratorSampleRateDefault = 44100.0f;
 
-static OSStatus ORKdBHLAudioGeneratorRenderTone(void *inRefCon,
-                                                AudioUnitRenderActionFlags *ioActionFlags,
-                                                const AudioTimeStamp         *inTimeStamp,
-                                                UInt32                     inBusNumber,
-                                                UInt32                     inNumberFrames,
-                                                AudioBufferList             *ioData) {
+OSStatus ORKdBHLAudioGeneratorRenderTone(void *inRefCon,
+                                     AudioUnitRenderActionFlags *ioActionFlags,
+                                     const AudioTimeStamp         *inTimeStamp,
+                                     UInt32                     inBusNumber,
+                                     UInt32                     inNumberFrames,
+                                     AudioBufferList             *ioData) {
+    
     // Get the tone parameters out of the view controller
     ORKdBHLToneAudiometryAudioGenerator *audioGenerator = (__bridge ORKdBHLToneAudiometryAudioGenerator *)inRefCon;
     double amplitude;
@@ -142,12 +143,13 @@ static OSStatus ORKdBHLAudioGeneratorRenderTone(void *inRefCon,
     return noErr;
 }
 
-static OSStatus ORKdBHLAudioGeneratorZeroTone(void *inRefCon,
-                                             AudioUnitRenderActionFlags *ioActionFlags,
-                                             const AudioTimeStamp         *inTimeStamp,
-                                             UInt32                     inBusNumber,
-                                             UInt32                     inNumberFrames,
-                                             AudioBufferList             *ioData) {
+OSStatus ORKdBHLAudioGeneratorZeroTone(void *inRefCon,
+                                         AudioUnitRenderActionFlags *ioActionFlags,
+                                         const AudioTimeStamp         *inTimeStamp,
+                                         UInt32                     inBusNumber,
+                                         UInt32                     inNumberFrames,
+                                         AudioBufferList             *ioData) {
+    
     // Get the tone parameters out of the view controller
     ORKdBHLToneAudiometryAudioGenerator *audioGenerator = (__bridge ORKdBHLToneAudiometryAudioGenerator *)inRefCon;
  
@@ -212,7 +214,8 @@ static OSStatus ORKdBHLAudioGeneratorZeroTone(void *inRefCon,
 
 - (void)setupGraph {
     if (!_mGraph) {
-        NewAUGraph(&_mGraph);
+        OSStatus result = noErr;
+        result = NewAUGraph(&_mGraph);
         AudioComponentDescription mixer_desc;
         mixer_desc.componentType = kAudioUnitType_Mixer;
         mixer_desc.componentSubType = kAudioUnitSubType_MultiChannelMixer;
@@ -227,17 +230,16 @@ static OSStatus ORKdBHLAudioGeneratorZeroTone(void *inRefCon,
         output_desc.componentFlagsMask = 0;
         output_desc.componentManufacturer = kAudioUnitManufacturer_Apple;
         
-        AUGraphAddNode(_mGraph, &output_desc, &_outputNode);
-        AUGraphAddNode(_mGraph, &mixer_desc, &_mixerNode );
+        result = AUGraphAddNode(_mGraph, &output_desc, &_outputNode);
+        result = AUGraphAddNode(_mGraph, &mixer_desc, &_mixerNode );
         
-        AUGraphConnectNodeInput(_mGraph, _mixerNode, 0, _outputNode, 0);
+        result = AUGraphConnectNodeInput(_mGraph, _mixerNode, 0, _outputNode, 0);
         
-        AUGraphOpen(_mGraph);
-        AUGraphNodeInfo(_mGraph, _mixerNode, NULL, &_mMixer);
-        
+        result = AUGraphOpen(_mGraph);
+        result = AUGraphNodeInfo(_mGraph, _mixerNode, NULL, &_mMixer);
         UInt32 numbuses = 3;
         UInt32 size = sizeof(numbuses);
-        AudioUnitSetProperty(_mMixer, kAudioUnitProperty_ElementCount, kAudioUnitScope_Input, 0, &numbuses, size);
+        result = AudioUnitSetProperty(_mMixer, kAudioUnitProperty_ElementCount, kAudioUnitScope_Input, 0, &numbuses, size);
         
         AudioStreamBasicDescription desc;
         for (int i = 0; i < numbuses; ++i) {
@@ -246,15 +248,15 @@ static OSStatus ORKdBHLAudioGeneratorZeroTone(void *inRefCon,
             
             if (i == 0) {
                 renderCallbackStruct.inputProc = ORKdBHLAudioGeneratorZeroTone;
-                AUGraphSetNodeInputCallback(_mGraph, _mixerNode, 0, &renderCallbackStruct);
+                result = AUGraphSetNodeInputCallback(_mGraph, _mixerNode, 0, &renderCallbackStruct);
             }
             size = sizeof(desc);
-            AudioUnitGetProperty(  _mMixer,
-                                    kAudioUnitProperty_StreamFormat,
-                                    kAudioUnitScope_Input,
-                                    i,
-                                    &desc,
-                                    &size);
+            result = AudioUnitGetProperty(  _mMixer,
+                                          kAudioUnitProperty_StreamFormat,
+                                          kAudioUnitScope_Input,
+                                          i,
+                                          &desc,
+                                          &size);
             memset (&desc, 0, sizeof (desc));
             const int four_bytes_per_float = 4;
             const int eight_bits_per_byte = 8;
@@ -268,26 +270,27 @@ static OSStatus ORKdBHLAudioGeneratorZeroTone(void *inRefCon,
             desc.mChannelsPerFrame = 2;
             desc.mBitsPerChannel = four_bytes_per_float * eight_bits_per_byte;
             
-            AudioUnitSetProperty(  _mMixer,
-                                    kAudioUnitProperty_StreamFormat,
-                                    kAudioUnitScope_Input,
-                                    i,
-                                    &desc,
-                                    sizeof(desc));
+            result = AudioUnitSetProperty(  _mMixer,
+                                          kAudioUnitProperty_StreamFormat,
+                                          kAudioUnitScope_Input,
+                                          i,
+                                          &desc,
+                                          sizeof(desc));
         }
+        result = AudioUnitSetProperty(     _mMixer,
+                                      kAudioUnitProperty_StreamFormat,
+                                      kAudioUnitScope_Output,
+                                      0,
+                                      &desc,
+                                      sizeof(desc));
+        result = AUGraphInitialize(_mGraph);
         
-        AudioUnitSetProperty(  _mMixer,
-                                kAudioUnitProperty_StreamFormat,
-                                kAudioUnitScope_Output,
-                                0,
-                                &desc,
-                                sizeof(desc));
-        AUGraphInitialize(_mGraph);
-        AUGraphStart(_mGraph);
+        result = AUGraphStart(_mGraph);
     }
 }
 
 - (void)play {
+    OSStatus result = noErr;
     _amplitudeGain = [self dbHLtoAmplitude:_globaldBHL atFrequency:_frequency];
     AURenderCallbackStruct renderCallbackStruct;
     renderCallbackStruct.inputProcRefCon = (__bridge void *)(self);
@@ -302,8 +305,8 @@ static OSStatus ORKdBHLAudioGeneratorZeroTone(void *inRefCon,
         connect = 2;
         disconnect = 1;
     }
-    AUGraphDisconnectNodeInput(_mGraph, _mixerNode, disconnect);
-    AUGraphSetNodeInputCallback(_mGraph, _mixerNode, connect, &renderCallbackStruct);
+    result = AUGraphDisconnectNodeInput(_mGraph, _mixerNode, disconnect);
+    result = AUGraphSetNodeInputCallback(_mGraph, _mixerNode, connect, &renderCallbackStruct);
     AUGraphUpdate(_mGraph, NULL);
 }
 
@@ -314,8 +317,9 @@ static OSStatus ORKdBHLAudioGeneratorZeroTone(void *inRefCon,
         dispatch_after(dispatch_time(DISPATCH_TIME_NOW, (int64_t)(_fadeInDuration * NSEC_PER_SEC)), dispatch_get_main_queue(), ^{
             if (_mGraph) {
                 dispatch_async(dispatch_get_main_queue(), ^{
-                    AUGraphDisconnectNodeInput(_mGraph, _mixerNode, nodeInput);
-                    AUGraphUpdate(_mGraph, NULL);
+                    OSStatus result = noErr;
+                    result = AUGraphDisconnectNodeInput(_mGraph, _mixerNode, nodeInput);
+                    result = AUGraphUpdate(_mGraph, NULL);
                 }); 
             }
         });

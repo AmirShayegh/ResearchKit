@@ -41,10 +41,8 @@ NS_ASSUME_NONNULL_BEGIN
  */
 ORK_CLASS_AVAILABLE
 @interface ORKRangeOfMotionStepViewController : ORKActiveStepViewController {
-    double _startAngle;
-    double _newAngle;
-    double _minAngle;
-    double _maxAngle;
+    double _flexedAngle;
+    double _rangeOfMotionAngle;
 }
 
 @end

@@ -30,7 +30,6 @@
 
 
 #import "ORKPasscodeStepView.h"
-#import "ORKStepContainerView_Private.h"
 
 #import "ORKStepHeaderView_Internal.h"
 #import "ORKTextFieldView.h"
@@ -40,18 +39,35 @@
     ORKPasscodeTextField *_textField;
 }
 
-- (instancetype)init {
-    self = [super init];
+- (instancetype)initWithFrame:(CGRect)frame {
+    self = [super initWithFrame:frame];
     if (self) {
         // Additional configuration for the passcode text field.
         _textField = [ORKPasscodeTextField new];
         _textField.translatesAutoresizingMaskIntoConstraints = NO;
-        self.customContentView = _textField;
+        self.stepView = _textField;
         
         // Setting image view with app icon (if available).
         NSDictionary *infoPlist = [[NSBundle mainBundle] infoDictionary];
         NSString *icon = [[infoPlist valueForKeyPath:@"CFBundleIcons.CFBundlePrimaryIcon.CFBundleIconFiles"] lastObject];
-        self.titleIconImage = [UIImage imageNamed:icon];
+        self.headerView.iconImageView.image = [UIImage imageNamed:icon];
+        self.headerView.iconImageView.layer.cornerRadius = 15.0;
+        self.headerView.iconImageView.layer.masksToBounds = YES;
+        self.headerView.iconImageView.layer.borderColor = [UIColor groupTableViewBackgroundColor].CGColor;
+        self.headerView.iconImageView.layer.borderWidth = 1.0;
+
+        
+        [self addConstraints:@[
+                               [NSLayoutConstraint constraintWithItem:_textField
+                                                            attribute:NSLayoutAttributeWidth
+                                                            relatedBy:NSLayoutRelationEqual
+                                                               toItem:self
+                                                            attribute:NSLayoutAttributeWidth
+                                                           multiplier:1.0
+                                                             constant:0]
+                               ]
+         ];
+        
     }
     return self;
 }

@@ -61,18 +61,6 @@ NS_ASSUME_NONNULL_BEGIN
  */
 - (void)resume;
 
-
-/**
- Creates a default step view controller suitable for presenting the passed step,
- and, if applicable, prefills its results using the `defaultResultSource`.
- */
-- (ORKStepViewController *)viewControllerForStep:(ORKStep *)step;
-
-/**
- Locks the device volume to a specific value. Will ignore a new locked value if the method was called before.
- */
-- (void)lockDeviceVolume:(float)volume;
-
 @end
 
 NS_ASSUME_NONNULL_END

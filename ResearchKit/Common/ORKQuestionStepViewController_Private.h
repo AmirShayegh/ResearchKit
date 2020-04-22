@@ -46,11 +46,6 @@ NS_ASSUME_NONNULL_BEGIN
  */
 @property (nonatomic, strong, nullable) ORKQuestionStepCustomView *customQuestionView;
 
-/**
- Set the step answer.
- */
-- (void)setAnswer:(id)answer;
-
 @end
 
 NS_ASSUME_NONNULL_END

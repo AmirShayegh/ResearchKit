@@ -30,39 +30,29 @@
 
 
 @import UIKit;
-#import <ResearchKit/ORKFormStep.h>
+
 
 NS_ASSUME_NONNULL_BEGIN
 
-@class ORKAnswerTextView;
+@class ORKSelectionTitleLabel;
+@class ORKSelectionSubTitleLabel;
 
 @interface ORKChoiceViewCell : UITableViewCell
 
+@property (nonatomic, strong, readonly) ORKSelectionTitleLabel *shortLabel;
+@property (nonatomic, strong, readonly) ORKSelectionSubTitleLabel *longLabel;
+
++ (CGFloat)suggestedCellHeightForShortText:(nullable NSString *)shortText LongText:(nullable NSString *)longText inTableView:(nullable UITableView *)tableView;
+
 @property (nonatomic, assign, getter=isImmediateNavigation) BOOL immediateNavigation;
 
-@property (nonatomic, assign, getter=isCellSelected) BOOL cellSelected;
+@property (nonatomic, assign, getter=isSelectedItem) BOOL selectedItem;
 
 @property (nonatomic) bool useCardView;
 
 @property (nonatomic) bool isLastItem;
 
 @property (nonatomic) BOOL isFirstItemInSectionWithoutTitle;
-
-@property (nonatomic) ORKCardViewStyle cardViewStyle;
-
-- (void)setPrimaryText:(NSString *)primaryText;
-- (void)setPrimaryAttributedText: (NSAttributedString *)primaryAttributedText;
-- (void)setDetailText:(NSString *)detailText;
-- (void)setDetailAttributedText:(NSAttributedString *)detailAttributedText;
-- (void)setCellSelected:(BOOL)cellSelected highlight:(BOOL)highlight;
-
-@end
-
-@interface ORKChoiceOtherViewCell : ORKChoiceViewCell <UITextViewDelegate>
-
-@property (nonatomic, strong, readonly) ORKAnswerTextView *textView;
-
-@property (nonatomic, assign, setter=hideTextView:) BOOL textViewHidden;
 
 @end
 

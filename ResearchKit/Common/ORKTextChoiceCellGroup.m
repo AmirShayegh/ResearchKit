@@ -35,12 +35,10 @@
 #import "ORKSelectionSubTitleLabel.h"
 
 #import "ORKChoiceViewCell.h"
-#import "ORKAnswerTextView.h"
 
 #import "ORKAnswerFormat_Internal.h"
 #import "ORKChoiceAnswerFormatHelper.h"
 
-#import "ORKHelpers_Internal.h"
 
 @implementation ORKTextChoiceCellGroup {
     ORKChoiceAnswerFormatHelper *_helper;
@@ -59,7 +57,6 @@
     if (self) {
         _beginningIndexPath = indexPath;
         _helper = [[ORKChoiceAnswerFormatHelper alloc] initWithAnswerFormat:answerFormat];
-        _answerFormat = answerFormat;
         _singleChoice = answerFormat.style == ORKChoiceAnswerStyleSingleChoice;
         _immediateNavigation = immediateNavigation;
         _cells = [NSMutableDictionary new];
@@ -75,7 +72,7 @@
 - (void)setAnswer:(id)answer {
     _answer = answer;
 
-    [self safelySetSelectedIndexesForAnswer:answer];
+    [self setSelectedIndexes:[_helper selectedIndexesForAnswer:answer]];
 }
 
 - (ORKChoiceViewCell *)cellAtIndexPath:(NSIndexPath *)indexPath withReuseIdentifier:(NSString *)identifier {
@@ -90,102 +87,52 @@
     ORKChoiceViewCell *cell = _cells[@(index)];
     
     if (cell == nil) {
-        ORKTextChoice *textChoice = [_helper textChoiceAtIndex:index];
-        if ([textChoice isKindOfClass:[ORKTextChoiceOther class]]) {
-            ORKChoiceOtherViewCell *choiceOtherViewCell = [[ORKChoiceOtherViewCell alloc] initWithStyle:UITableViewCellStyleDefault reuseIdentifier:identifier];
-            ORKTextChoiceOther *textChoiceOther = (ORKTextChoiceOther *)textChoice;
-            choiceOtherViewCell.textView.placeholder = textChoiceOther.textViewPlaceholderText;
-            choiceOtherViewCell.textView.text = textChoiceOther.textViewText;
-            [choiceOtherViewCell hideTextView:textChoiceOther.textViewStartsHidden];
-            cell = choiceOtherViewCell;
-        } else {
-            cell = [[ORKChoiceViewCell alloc] initWithStyle:UITableViewCellStyleDefault reuseIdentifier:identifier];
-        }
+        cell = [[ORKChoiceViewCell alloc] initWithStyle:UITableViewCellStyleDefault reuseIdentifier:identifier];
         cell.immediateNavigation = _immediateNavigation;
-        [cell setPrimaryText:textChoice.text];
-        [cell setDetailText:textChoice.detailText];
-        if (textChoice.primaryTextAttributedString) {
-            [cell setPrimaryAttributedText:textChoice.primaryTextAttributedString];
-        }
-        if (textChoice.detailTextAttributedString) {
-            [cell setDetailAttributedText:textChoice.detailTextAttributedString];
-        }
+        ORKTextChoice *textChoice = [_helper textChoiceAtIndex:index];
+        cell.shortLabel.text = textChoice.text;
+        cell.longLabel.text = textChoice.detailText;
+        
         _cells[@(index)] = cell;
         
-        [self safelySetSelectedIndexesForAnswer:_answer];
+        [self setSelectedIndexes:[_helper selectedIndexesForAnswer:_answer]];
     }
     
     return cell;
 }
 
-- (void)updateTextViewForChoiceOtherCell:(ORKChoiceOtherViewCell *)choiceCell withTextChoiceOther:(ORKTextChoiceOther *)choiceOther {
-    if (choiceOther.textViewStartsHidden && choiceCell.textView.text.length <= 0) {
-        [choiceCell hideTextView:!choiceCell.textViewHidden];
-        [self.delegate tableViewCellHeightUpdated];
-    }
-}
-
-- (void)textViewDidResignResponderForCellAtIndexPath:(NSIndexPath *)indexPath {
-    if ([self containsIndexPath:indexPath]== NO) {
-        return;
-    }
-    NSUInteger index = indexPath.row - _beginningIndexPath.row;
-    ORKChoiceOtherViewCell *touchedCell = (ORKChoiceOtherViewCell *) [self cellAtIndex:index withReuseIdentifier:nil];
-    ORKTextChoiceOther *textChoice = (ORKTextChoiceOther *) [_helper textChoiceAtIndex:index];
-    
-    if (touchedCell.textView.text.length > 0) {
-        textChoice.textViewText = touchedCell.textView.text;
-        [self didSelectCellAtIndexPath:indexPath];
-    } else {
-        textChoice.textViewText = nil;
-        if (!textChoice.textViewInputOptional) {
-            [touchedCell setCellSelected:NO highlight:NO];
-        }
-        _answer = [_helper answerForSelectedIndexes:[self selectedIndexes]];
-        [self.delegate answerChangedForIndexPath:indexPath];
-    }
-}
-
-- (void)didSelectCellAtIndexPath:(NSIndexPath *)indexPath {
-    if ([self containsIndexPath:indexPath]== NO) {
-        return;
-    }
-    NSUInteger index = indexPath.row - _beginningIndexPath.row;
+- (void)didSelectCellAtIndex:(NSUInteger)index {
     ORKChoiceViewCell *touchedCell = [self cellAtIndex:index withReuseIdentifier:nil];
-    ORKTextChoice *textChoice = [_helper textChoiceAtIndex:index];
-    
-    if ([textChoice isKindOfClass:[ORKTextChoiceOther class]] && [touchedCell isKindOfClass:[ORKChoiceOtherViewCell class]]) {
-        ORKTextChoiceOther *otherTextChoice = (ORKTextChoiceOther *)textChoice;
-        ORKChoiceOtherViewCell *touchedOtherCell = (ORKChoiceOtherViewCell *)touchedCell;
-        [self updateTextViewForChoiceOtherCell:touchedOtherCell withTextChoiceOther:otherTextChoice];
-        if (!otherTextChoice.textViewInputOptional && otherTextChoice.textViewText.length <= 0) {
-            return;
-        }
-    }
-    
+        
     if (_singleChoice) {
-        [touchedCell setCellSelected:YES highlight:YES];
+        touchedCell.selectedItem = YES;
         for (ORKChoiceViewCell *cell in _cells.allValues) {
             if (cell != touchedCell) {
-                [cell setCellSelected:NO highlight:NO];
+                cell.selectedItem = NO;
             }
         }
     } else {
-        [touchedCell setCellSelected:!touchedCell.isCellSelected highlight:YES];
-        if (touchedCell.isCellSelected) {
+        touchedCell.selectedItem = !touchedCell.selectedItem;
+        if (touchedCell.selectedItem) {
             ORKTextChoice *touchedChoice = [_helper textChoiceAtIndex:index];
             for (NSNumber *num in _cells.allKeys) {
                 ORKChoiceViewCell *cell = _cells[num];
                 ORKTextChoice *choice = [_helper textChoiceAtIndex:num.unsignedIntegerValue];
-                if (cell != touchedCell && (touchedChoice.exclusive || (cell.isCellSelected && choice.exclusive))) {
-                    [cell setCellSelected:NO highlight:NO];
+                if (cell != touchedCell && (touchedChoice.exclusive || (cell.selectedItem && choice.exclusive))) {
+                    cell.selectedItem = NO;
                 }
             }
         }
     }
     
     _answer = [_helper answerForSelectedIndexes:[self selectedIndexes]];
-    [self.delegate answerChangedForIndexPath:indexPath];
+}
+
+- (void)didSelectCellAtIndexPath:(NSIndexPath *)indexPath {
+    if ([self containsIndexPath:indexPath]== NO) {
+        return;
+    }
+    [self didSelectCellAtIndex:indexPath.row - _beginningIndexPath.row];
 }
 
 - (BOOL)containsIndexPath:(NSIndexPath *)indexPath {
@@ -196,18 +143,6 @@
             (indexPath.row < (_beginningIndexPath.row + count));
 }
 
--(void)safelySetSelectedIndexesForAnswer:(nullable id)answer {
-    NSArray *selectedIndexes;
-    @try {
-        selectedIndexes = [_helper selectedIndexesForAnswer:answer];
-    } @catch (NSException *exception) {
-        selectedIndexes = [[NSArray alloc] init];
-        ORK_Log_Error("Error getting selected indexes: %@", exception.reason);
-    } @finally {
-        [self setSelectedIndexes: selectedIndexes];
-    }
-}
-
 - (void)setSelectedIndexes:(NSArray *)indexes {
     for (NSUInteger index = 0; index < self.size; index++ ) {
         BOOL selected = [indexes containsObject:@(index)];
@@ -215,11 +150,11 @@
         if (selected) {
             // In case the cell has not been created, need to create cell
             ORKChoiceViewCell *cell = [self cellAtIndex:index withReuseIdentifier:nil];
-            [cell setCellSelected:YES highlight:NO];
+            cell.selectedItem = YES;
         } else {
             // It is ok to not create the cell at here
             ORKChoiceViewCell *cell = _cells[@(index)];
-            [cell setCellSelected:NO highlight:NO];
+            cell.selectedItem = NO;
         }
     }
 }
@@ -229,7 +164,7 @@
     
     for (NSUInteger index = 0; index < self.size; index++ ) {
         ORKChoiceViewCell *cell = _cells[@(index)];
-        if (cell.isCellSelected) {
+        if (cell.selectedItem) {
             [indexes addObject:@(index)];
         }
     }

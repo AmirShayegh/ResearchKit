@@ -39,21 +39,15 @@
 
 - (void)encodeWithCoder:(NSCoder *)aCoder {
     [super encodeWithCoder:aCoder];
-    ORK_ENCODE_DOUBLE(aCoder, start);
-    ORK_ENCODE_DOUBLE(aCoder, finish);
-    ORK_ENCODE_DOUBLE(aCoder, minimum);
-    ORK_ENCODE_DOUBLE(aCoder, maximum);
-    ORK_ENCODE_DOUBLE(aCoder, range);
+    ORK_ENCODE_DOUBLE(aCoder, flexed);
+    ORK_ENCODE_DOUBLE(aCoder, extended);
 }
 
 - (id)initWithCoder:(NSCoder *)aDecoder {
     self = [super initWithCoder:aDecoder];
     if (self) {
-        ORK_DECODE_DOUBLE(aDecoder, start);
-        ORK_DECODE_DOUBLE(aDecoder, finish);
-        ORK_DECODE_DOUBLE(aDecoder, minimum);
-        ORK_DECODE_DOUBLE(aDecoder, maximum);
-        ORK_DECODE_DOUBLE(aDecoder, range);
+        ORK_DECODE_DOUBLE(aDecoder, flexed);
+        ORK_DECODE_DOUBLE(aDecoder, extended);
     }
     return self;
 }
@@ -66,11 +60,8 @@
     BOOL isParentSame = [super isEqual:object];
     __typeof(self) castObject = object;
     return isParentSame &&
-    self.start == castObject.start &&
-    self.finish == castObject.finish &&
-    self.minimum == castObject.minimum &&
-    self.maximum == castObject.maximum &&
-    self.range == castObject.range;
+    self.flexed == castObject.flexed &&
+    self.extended == castObject.extended;
 }
 
 - (NSUInteger)hash {
@@ -79,16 +70,13 @@
 
 - (instancetype)copyWithZone:(NSZone *)zone {
     ORKRangeOfMotionResult *result = [super copyWithZone:zone];
-    result.start = self.start;
-    result.finish = self.finish;
-    result.minimum = self.minimum;
-    result.maximum = self.maximum;
-    result.range = self.range;
+    result.flexed = self.flexed;
+    result.extended = self.extended;
     return result;
 }
 
 - (NSString *)descriptionWithNumberOfPaddingSpaces:(NSUInteger)numberOfPaddingSpaces {
-    return [NSString stringWithFormat:@"<%@: start: %f; finish: %f; minimum: %f; maximum: %f; range: %f>", self.class.description, self.start, self.finish, self.minimum, self.maximum, self.range];
+    return [NSString stringWithFormat:@"<%@: flexion: %f; extension: %f>", self.class.description, self.flexed, self.extended];
 }
 
 @end

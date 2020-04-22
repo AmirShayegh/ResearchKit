@@ -76,10 +76,12 @@
     [super viewDidLoad];
     
     self.view.backgroundColor = [UIColor blackColor];
+    [self.navigationController setNavigationBarHidden:YES animated:NO];
+    [self.navigationFooterView setHidden:YES];
     _amslerGridView = [ORKAmslerGridContentView new];
     _amslerGridView.translatesAutoresizingMaskIntoConstraints = NO;
     self.activeStepView.activeCustomView = _amslerGridView;
-    [self.activeStepView removeCustomContentPadding];
+    self.activeStepView.stepViewFillsAvailableSpace = YES;
     
     _freehandDrawingView = [ORKFreehandDrawingView new];
 
@@ -89,8 +91,9 @@
 
     [_amslerGridView addSubview:_freehandDrawingView];
    
-    UIPanGestureRecognizer *panGestureRecognizer = [[UIPanGestureRecognizer alloc] initWithTarget:self action:@selector(handlePanGesture:)];
-    [self.activeStepView addGestureRecognizer:panGestureRecognizer];
+    UISwipeGestureRecognizer *r = [[UISwipeGestureRecognizer alloc] initWithTarget:self action:@selector(handleSingleTap:)];
+    r.direction = UISwipeGestureRecognizerDirectionLeft;
+    [self.activeStepView addGestureRecognizer:r];
     
     self.activeStepView.isAccessibilityElement = YES;
     self.activeStepView.accessibilityLabel = ORKLocalizedString(@"AX_AMSLER_GRID_LABEL", nil);
@@ -99,15 +102,42 @@
     [self setupContraints];
 }
 
-- (void)handlePanGesture:(UIPanGestureRecognizer *)recognizer {
-    if (recognizer.state == UIGestureRecognizerStateChanged) {
-        [self finish];
-    }
+- (void)handleSingleTap:(UISwipeGestureRecognizer *)recognizer {
+    [self finish];
 }
 
 - (void)setupContraints {
     CGFloat width = MIN(self.view.bounds.size.width, self.view.bounds.size.height);
     NSArray *constraints = @[
+                             
+                             [NSLayoutConstraint constraintWithItem:_amslerGridView
+                                                          attribute:NSLayoutAttributeWidth
+                                                          relatedBy:NSLayoutRelationEqual
+                                                             toItem:nil
+                                                          attribute:NSLayoutAttributeNotAnAttribute
+                                                         multiplier:1.0
+                                                           constant:width],
+                             [NSLayoutConstraint constraintWithItem:_amslerGridView
+                                                          attribute:NSLayoutAttributeHeight
+                                                          relatedBy:NSLayoutRelationEqual
+                                                             toItem:nil
+                                                          attribute:NSLayoutAttributeNotAnAttribute
+                                                         multiplier:1.0
+                                                           constant:width],
+                             [NSLayoutConstraint constraintWithItem:_amslerGridView
+                                                          attribute:NSLayoutAttributeCenterX
+                                                          relatedBy:NSLayoutRelationEqual
+                                                             toItem:self.view
+                                                          attribute:NSLayoutAttributeCenterX
+                                                         multiplier:1.0
+                                                           constant:0.0],
+                             [NSLayoutConstraint constraintWithItem:_amslerGridView
+                                                          attribute:NSLayoutAttributeCenterY
+                                                          relatedBy:NSLayoutRelationEqual
+                                                             toItem:self.view
+                                                          attribute:NSLayoutAttributeCenterY
+                                                         multiplier:1.0
+                                                           constant:0.0],
                              [NSLayoutConstraint constraintWithItem:_freehandDrawingView
                                                           attribute:NSLayoutAttributeWidth
                                                           relatedBy:NSLayoutRelationEqual

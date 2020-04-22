@@ -38,12 +38,10 @@
 #import "ORKSelectionSubTitleLabel.h"
 #import "ORKStepHeaderView_Internal.h"
 #import "ORKTableContainerView.h"
-#import "ORKBodyItem.h"
 
 #import "ORKStepViewController_Internal.h"
 #import "ORKTaskViewController_Internal.h"
 
-#import "ORKStepContentView.h"
 #import "ORKAnswerFormat_Internal.h"
 #import "ORKCollectionResult_Private.h"
 #import "ORKFormStep.h"
@@ -67,6 +65,7 @@
 
 
 @implementation ORKReviewStepViewController {
+    ORKNavigationContainerView *_navigationFooterView;
     NSArray<NSLayoutConstraint *> *_constraints;
 }
  
@@ -104,9 +103,19 @@
     _navigationFooterView.continueButtonItem = continueButtonItem;
 }
 
+- (void)setLearnMoreButtonItem:(UIBarButtonItem *)learnMoreButtonItem {
+    [super setLearnMoreButtonItem:learnMoreButtonItem];
+    _tableContainer.stepHeaderView.learnMoreButtonItem = self.learnMoreButtonItem;
+}
+
 - (void)setSkipButtonItem:(UIBarButtonItem *)skipButtonItem {
     [super setSkipButtonItem:skipButtonItem];
     _navigationFooterView.skipButtonItem = self.skipButtonItem;
+}
+
+- (void)setCancelButtonItem:(UIBarButtonItem *)cancelButtonItem {
+    [super setCancelButtonItem:cancelButtonItem];
+    _navigationFooterView.cancelButtonItem = self.cancelButtonItem;
 }
 
 - (void)stepDidChange {
@@ -117,10 +126,11 @@
     
     _tableContainer.tableView.delegate = nil;
     _tableContainer.tableView.dataSource = nil;
+    [_navigationFooterView removeFromSuperview];
     _navigationFooterView = nil;
     
     if ([self reviewStep]) {
-        _tableContainer = [ORKTableContainerView new];
+        _tableContainer = [[ORKTableContainerView alloc] initWithFrame:self.view.bounds];
         _tableContainer.tableView.delegate = self;
         _tableContainer.tableView.dataSource = self;
         _tableContainer.tableView.clipsToBounds = YES;
@@ -128,16 +138,17 @@
         [self.view addSubview:_tableContainer];
         _tableContainer.tapOffView = self.view;
         
-        _tableContainer.stepContentView.stepTitle = [[self reviewStep] title];
-        _tableContainer.stepContentView.stepText = [[self reviewStep] text];
-        _tableContainer.stepContentView.bodyItems = [[self reviewStep] bodyItems];
-        
+        _tableContainer.stepHeaderView.captionLabel.useSurveyMode = self.step.useSurveyMode;
+        _tableContainer.stepHeaderView.instructionLabel.text = [self reviewStep].text;
+        _tableContainer.stepHeaderView.learnMoreButtonItem = self.learnMoreButtonItem;
         [_tableContainer.tableView setBackgroundColor:ORKNeedWideScreenDesign(self.view) ? [UIColor clearColor] : ORKColor(ORKBackgroundColorKey)];
-        _navigationFooterView = _tableContainer.navigationFooterView;
+        _navigationFooterView = [ORKNavigationContainerView new];
         _navigationFooterView.skipButtonItem = self.skipButtonItem;
         _navigationFooterView.continueEnabled = YES;
         _navigationFooterView.continueButtonItem = self.continueButtonItem;
         _navigationFooterView.optional = self.step.optional;
+        _navigationFooterView.cancelButtonItem = self.cancelButtonItem;
+        [self.view addSubview:_navigationFooterView];
         [self setupConstraints];
         [_tableContainer setNeedsLayout];
     }
@@ -149,35 +160,59 @@
         [NSLayoutConstraint deactivateConstraints:_constraints];
     }
     _tableContainer.translatesAutoresizingMaskIntoConstraints = NO;
+    _navigationFooterView.translatesAutoresizingMaskIntoConstraints = NO;
     _constraints = nil;
+    
+    UIView *viewForiPad = [self viewForiPadLayoutConstraints];
     
     _constraints = @[
                      [NSLayoutConstraint constraintWithItem:_tableContainer
                                                   attribute:NSLayoutAttributeTop
                                                   relatedBy:NSLayoutRelationEqual
-                                                     toItem:self.view
+                                                     toItem:viewForiPad ? : self.view.safeAreaLayoutGuide
                                                   attribute:NSLayoutAttributeTop
                                                  multiplier:1.0
                                                    constant:0.0],
                      [NSLayoutConstraint constraintWithItem:_tableContainer
                                                   attribute:NSLayoutAttributeLeft
                                                   relatedBy:NSLayoutRelationEqual
-                                                     toItem:self.view
+                                                     toItem:viewForiPad ? : self.view.safeAreaLayoutGuide
                                                   attribute:NSLayoutAttributeLeft
                                                  multiplier:1.0
                                                    constant:0.0],
                      [NSLayoutConstraint constraintWithItem:_tableContainer
                                                   attribute:NSLayoutAttributeRight
                                                   relatedBy:NSLayoutRelationEqual
-                                                     toItem:self.view
+                                                     toItem:viewForiPad ? : self.view.safeAreaLayoutGuide
+                                                  attribute:NSLayoutAttributeRight
+                                                 multiplier:1.0
+                                                   constant:0.0],
+                     [NSLayoutConstraint constraintWithItem:_navigationFooterView
+                                                  attribute:NSLayoutAttributeBottom
+                                                  relatedBy:NSLayoutRelationEqual
+                                                     toItem:viewForiPad ? : self.view
+                                                  attribute:NSLayoutAttributeBottom
+                                                 multiplier:1.0
+                                                   constant:0.0],
+                     [NSLayoutConstraint constraintWithItem:_navigationFooterView
+                                                  attribute:NSLayoutAttributeLeft
+                                                  relatedBy:NSLayoutRelationEqual
+                                                     toItem:viewForiPad ? : self.view
+                                                  attribute:NSLayoutAttributeLeft
+                                                 multiplier:1.0
+                                                   constant:0.0],
+                     [NSLayoutConstraint constraintWithItem:_navigationFooterView
+                                                  attribute:NSLayoutAttributeRight
+                                                  relatedBy:NSLayoutRelationEqual
+                                                     toItem:viewForiPad ? : self.view
                                                   attribute:NSLayoutAttributeRight
                                                  multiplier:1.0
                                                    constant:0.0],
                      [NSLayoutConstraint constraintWithItem:_tableContainer
                                                   attribute:NSLayoutAttributeBottom
                                                   relatedBy:NSLayoutRelationEqual
-                                                     toItem:self.view
-                                                  attribute:NSLayoutAttributeBottom
+                                                     toItem:_navigationFooterView
+                                                  attribute:NSLayoutAttributeTop
                                                  multiplier:1.0
                                                    constant:0.0]
                      ];
@@ -209,8 +244,8 @@
     cell.immediateNavigation = YES;
     ORKStep *step = _steps[indexPath.row];
     ORKStepResult *stepResult = [_resultSource stepResultForStepIdentifier:step.identifier];
-    [cell setPrimaryText:step.title ? : step.text];
-    [cell setDetailText:[self answerStringForStep:step withStepResult:stepResult]];
+    cell.shortLabel.text = step.title != nil ? step.title : step.text;
+    cell.longLabel.text = [self answerStringForStep:step withStepResult:stepResult];
     return cell;
 }
 
@@ -235,11 +270,7 @@
 - (NSString *)answerStringForQuestionStep:(ORKQuestionStep *)questionStep withQuestionResult:(ORKQuestionResult *)questionResult {
     NSString *answerString = nil;
     if (questionStep && questionResult && questionStep.answerFormat && [questionResult isKindOfClass:questionStep.answerFormat.questionResultClass] && questionResult.answer) {
-        if ([questionResult.answer isKindOfClass:[ORKDontKnowAnswer class]]) {
-            answerString = questionStep.answerFormat.customDontKnowButtonText;
-        } else {
-            answerString = [questionStep.answerFormat stringForAnswer:questionResult.answer];
-        }
+        answerString = [questionStep.answerFormat stringForAnswer:questionResult.answer];
     }
     return answerString;
 }
@@ -254,12 +285,7 @@
                 ORKQuestionResult *questionResult = (ORKQuestionResult *)formItemResult;
                 if (formItem.answerFormat && [questionResult isKindOfClass:formItem.answerFormat.questionResultClass] && questionResult.answer) {
                     NSString *formItemTextString = formItem.text;
-                    NSString *formItemAnswerString;
-                    if ([questionResult.answer isKindOfClass:[ORKDontKnowAnswer class]]) {
-                        formItemAnswerString = formItem.answerFormat.customDontKnowButtonText;
-                    } else {
-                        formItemAnswerString = [formItem.answerFormat stringForAnswer:questionResult.answer];
-                    }
+                    NSString *formItemAnswerString = [formItem.answerFormat stringForAnswer:questionResult.answer];
                     if (formItemTextString && formItemAnswerString) {
                         [answerStrings addObject:[@[formItemTextString, formItemAnswerString] componentsJoinedByString:@"\n"]];
                     }
@@ -281,7 +307,12 @@
 }
 
 - (CGFloat)tableView:(UITableView *)tableView heightForRowAtIndexPath:(NSIndexPath *)indexPath {
-    return UITableViewAutomaticDimension;
+    ORKStep *step = _steps[indexPath.row];
+    ORKStepResult *stepResult = [_resultSource stepResultForStepIdentifier:step.identifier];
+    NSString *shortText = step.title != nil ? step.title : step.text;
+    NSString *longText = [self answerStringForStep:step withStepResult:stepResult];
+    CGFloat height = [ORKChoiceViewCell suggestedCellHeightForShortText:shortText LongText:longText inTableView:_tableContainer.tableView];
+    return height;
 }
 
 @end

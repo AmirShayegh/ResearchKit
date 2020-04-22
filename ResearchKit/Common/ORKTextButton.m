@@ -79,6 +79,11 @@
 
 }
 
+- (void)setEnabled:(BOOL)enabled {
+    [super setEnabled:enabled];
+    [self.titleLabel setEnabled:enabled];
+}
+
 - (void)dealloc {
     [[NSNotificationCenter defaultCenter] removeObserver:self];
 }
@@ -90,6 +95,7 @@
 }
 
 - (CGSize)intrinsicContentSize {
+    // Fix for <rdar://problem/19528969>
     UILabel *label = nil;
     
     for (UIView *view in self.subviews) {

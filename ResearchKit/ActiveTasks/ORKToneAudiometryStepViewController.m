@@ -42,9 +42,8 @@
 #import "ORKCollectionResult_Private.h"
 #import "ORKToneAudiometryResult.h"
 #import "ORKToneAudiometryStep.h"
-#import "ORKStepContainerView_Private.h"
+
 #import "ORKHelpers_Internal.h"
-#import "ORKNavigationContainerView_Internal.h"
 
 #import <MediaPlayer/MediaPlayer.h>
 
@@ -96,7 +95,6 @@
     [self generateFrequencyCombination];
     self.toneAudiometryContentView = [[ORKToneAudiometryContentView alloc] init];
     self.activeStepView.activeCustomView = self.toneAudiometryContentView;
-    self.activeStepView.customContentFillsAvailableSpace = YES;
     
     [self.toneAudiometryContentView.leftButton addTarget:self action:@selector(buttonPressed:forEvent:) forControlEvents:UIControlEventTouchDown];
     [self.toneAudiometryContentView.rightButton addTarget:self action:@selector(buttonPressed:forEvent:) forControlEvents:UIControlEventTouchDown];

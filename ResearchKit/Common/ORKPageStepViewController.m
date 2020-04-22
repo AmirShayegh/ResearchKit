@@ -124,9 +124,9 @@ typedef NS_ENUM(NSInteger, ORKPageNavigationDirection) {
     [self navigateInDirection:ORKPageNavigationDirectionNone animated:NO];
 }
 
-- (void)updateBarButtonItems {
+- (void)updateNavLeftBarButtonItem {
     if ((self.currentStepIdentifier == nil) || ([self stepInDirection:ORKPageNavigationDirectionReverse] == nil)) {
-        [super updateBarButtonItems];
+        [super updateNavLeftBarButtonItem];
     } else {
         self.navigationItem.leftBarButtonItem = [self goToPreviousPageButtonItem];
     }
@@ -256,7 +256,7 @@ typedef NS_ENUM(NSInteger, ORKPageNavigationDirection) {
     ORKStepViewController *stepViewController = [self stepViewControllerForStep:step];
     
     if (!stepViewController) {
-        ORK_Log_Debug("No view controller!");
+        ORK_Log_Debug(@"No view controller!");
         [self goForward];
         return;
     }
@@ -281,7 +281,7 @@ typedef NS_ENUM(NSInteger, ORKPageNavigationDirection) {
     [self.pageViewController setViewControllers:@[stepViewController] direction:direction animated:animated completion:^(BOOL finished) {
         if (finished) {
             ORKStrongTypeOf(weakSelf) strongSelf = weakSelf;
-            [strongSelf updateBarButtonItems];
+            [strongSelf updateNavLeftBarButtonItem];
             UIAccessibilityPostNotification(UIAccessibilityScreenChangedNotification, strongSelf.navigationItem.leftBarButtonItem);
         }
     }];

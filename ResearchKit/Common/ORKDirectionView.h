@@ -30,8 +30,8 @@
 
 
 @import UIKit;
-#import <ResearchKit/ORKDefines.h>
-#import <ResearchKit/ORKTypes.h>
+#import "ORKDefines.h"
+#import "ORKTypes.h"
 
 
 NS_ASSUME_NONNULL_BEGIN

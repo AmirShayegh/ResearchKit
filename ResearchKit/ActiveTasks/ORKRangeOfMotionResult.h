@@ -37,35 +37,20 @@ NS_ASSUME_NONNULL_BEGIN
 /**
  The `ORKRangeOfMotionResult` class records the results of a range of motion active task.
  
- An `ORKRangeOfMotionResult` object records the angle values in degrees.
+ An `ORKRangeOfMotionResult` object records the flexion and extension values in degrees.
  */
 ORK_CLASS_AVAILABLE
 @interface ORKRangeOfMotionResult : ORKResult
 
 /**
- The angle (degrees) from the device reference position at the start position.
+ The degrees when bent.
  */
-@property (nonatomic, assign) double start;
+@property (nonatomic, assign) double flexed;
 
 /**
- The angle (degrees) from the device reference position when the task finishes recording.
+ The degrees when extended.
  */
-@property (nonatomic, assign) double finish;
-
-/**
- The angle (degrees) from the device reference position at the minimum angle (e.g. when the knee is most bent, such as at the end of the task).
- */
-@property (nonatomic, assign) double minimum;
-
-/**
- The angle (degrees) from the device reference position at the maximum angle (e.g. when the knee is extended).
- */
-@property (nonatomic, assign) double maximum;
-
-/**
- The angle (degrees) passed through from the start position to the maximum angle (e.g. from when the knee is flexed to when it is extended).
- */
-@property (nonatomic, assign) double range;
+@property (nonatomic, assign) double extended;
 
 @end
 

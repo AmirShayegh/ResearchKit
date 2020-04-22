@@ -766,7 +766,7 @@ const CGFloat PDFhideViewAnimationDuration = 0.5;
     return _pdfView.document;
 }
 
-#pragma mark UISearchBarDelegate
+#pragma UISearchBarDelegate
 
 - (void)searchBar:(UISearchBar *)searchBar textDidChange:(NSString *)searchText {
     [_pdfView.document beginFindString:searchText withOptions:NSCaseInsensitiveSearch];
@@ -827,13 +827,13 @@ const CGFloat PDFhideViewAnimationDuration = 0.5;
     [self updateActionButtonsAppearance];
 }
 
-#pragma mark ORKFreehandDrawingViewDelegate
+#pragma ORKFreehandDrawingViewDelegate
 
 - (void)freehandDrawingViewDidEditImage:(ORKFreehandDrawingView *)freehandDrawingView {
     [self updateClearApplyAnnotationButtons];
 }
 
-#pragma mark PDFDocumentDelegate
+#pragma PDFDocumentDelegate
 
 - (void)documentDidUnlock:(NSNotification *)notification {
     [self setEnableAllButtons:YES];

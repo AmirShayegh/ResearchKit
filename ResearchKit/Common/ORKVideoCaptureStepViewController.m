@@ -207,13 +207,13 @@
     }
     
     if (device) {
-        // Check if the device has the requested torchMode
-        if([device isTorchModeSupported:_videoCaptureStep.torchMode]){
+        // Check if the device has flash.
+        if ([device isFlashModeSupported:_videoCaptureStep.flashMode]) {
             [device lockForConfiguration:nil];
-            device.torchMode = _videoCaptureStep.torchMode;
+            device.flashMode = _videoCaptureStep.flashMode;
             [device unlockForConfiguration];
         }
-        
+
         // Configure the input and output
         AVCaptureDeviceInput *input = [AVCaptureDeviceInput deviceInputWithDevice:device error:nil];
         
@@ -335,7 +335,7 @@
             });
         }
         else {
-            ORK_Log_Info("Connection not ready");
+            NSLog(@"Connection not ready");
             // Use the main queue, as UI components may need to be updated
             dispatch_async(dispatch_get_main_queue(), ^{
                 if (handler) {

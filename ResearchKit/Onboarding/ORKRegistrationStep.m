@@ -45,8 +45,8 @@ NSString *const ORKRegistrationFormItemIdentifierGender = @"ORKRegistrationFormI
 NSString *const ORKRegistrationFormItemIdentifierDOB = @"ORKRegistrationFormItemDOB";
 NSString *const ORKRegistrationFormItemIdentifierPhoneNumber = @"ORKRegistrationFormItemPhoneNumber";
 
-static _Nullable id ORKFindInArrayByFormItemId(NSArray *array, NSString *formItemIdentifier) {
-    return ORKFindInArrayByKey(array, @"identifier", formItemIdentifier);
+static id ORKFindInArrayByFormItemId(NSArray *array, NSString *formItemIdentifier) {
+    return findInArrayByKey(array, @"identifier", formItemIdentifier);
 }
 
 static NSArray <ORKFormItem*> *ORKRegistrationFormItems(ORKRegistrationStepOption options) {
@@ -54,7 +54,6 @@ static NSArray <ORKFormItem*> *ORKRegistrationFormItems(ORKRegistrationStepOptio
     
     {
         ORKEmailAnswerFormat *answerFormat = [ORKAnswerFormat emailAnswerFormat];
-        answerFormat.usernameField = YES;
         
         ORKFormItem *item = [[ORKFormItem alloc] initWithIdentifier:ORKRegistrationFormItemIdentifierEmail
                                                                text:ORKLocalizedString(@"EMAIL_FORM_ITEM_TITLE", nil)
@@ -73,12 +72,6 @@ static NSArray <ORKFormItem*> *ORKRegistrationFormItems(ORKRegistrationStepOptio
         answerFormat.autocapitalizationType = UITextAutocapitalizationTypeNone;
         answerFormat.autocorrectionType = UITextAutocorrectionTypeNo;
         answerFormat.spellCheckingType = UITextSpellCheckingTypeNo;
-        
-        if (@available(iOS 12.0, *)) {
-            answerFormat.textContentType = UITextContentTypeNewPassword;
-        } else {
-            answerFormat.textContentType = UITextContentTypePassword;
-        }
         
         ORKFormItem *item = [[ORKFormItem alloc] initWithIdentifier:ORKRegistrationFormItemIdentifierPassword
                                                                text:ORKLocalizedString(@"PASSWORD_FORM_ITEM_TITLE", nil)
@@ -108,7 +101,6 @@ static NSArray <ORKFormItem*> *ORKRegistrationFormItems(ORKRegistrationStepOptio
     if (options & ORKRegistrationStepIncludeGivenName) {
         ORKTextAnswerFormat *answerFormat = [ORKAnswerFormat textAnswerFormat];
         answerFormat.multipleLines = NO;
-        answerFormat.textContentType = UITextContentTypeGivenName;
         
         ORKFormItem *item = [[ORKFormItem alloc] initWithIdentifier:ORKRegistrationFormItemIdentifierGivenName
                                                                text:ORKLocalizedString(@"CONSENT_NAME_GIVEN", nil)
@@ -122,7 +114,6 @@ static NSArray <ORKFormItem*> *ORKRegistrationFormItems(ORKRegistrationStepOptio
     if (options & ORKRegistrationStepIncludeFamilyName) {
         ORKTextAnswerFormat *answerFormat = [ORKAnswerFormat textAnswerFormat];
         answerFormat.multipleLines = NO;
-        answerFormat.textContentType = UITextContentTypeFamilyName;
         
         ORKFormItem *item = [[ORKFormItem alloc] initWithIdentifier:ORKRegistrationFormItemIdentifierFamilyName
                                                                text:ORKLocalizedString(@"CONSENT_NAME_FAMILY", nil)
@@ -186,7 +177,6 @@ static NSArray <ORKFormItem*> *ORKRegistrationFormItems(ORKRegistrationStepOptio
         answerFormat.autocorrectionType = UITextAutocorrectionTypeNo;
         answerFormat.spellCheckingType = UITextSpellCheckingTypeNo;
         answerFormat.keyboardType = UIKeyboardTypeNumbersAndPunctuation;
-        answerFormat.textContentType = UITextContentTypeTelephoneNumber;
         
         ORKFormItem *item = [[ORKFormItem alloc] initWithIdentifier:ORKRegistrationFormItemIdentifierPhoneNumber
                                                                text:ORKLocalizedString(@"PHONE_NUMBER_FORM_ITEM_TITLE", nil)
@@ -293,14 +283,6 @@ passcodeValidationRegularExpression:nil
 
 - (void)setPasscodeInvalidMessage:(NSString *)passcodeInvalidMessage {
     [self passwordAnswerFormat].invalidMessage = passcodeInvalidMessage;
-}
-
-- (UITextInputPasswordRules *)passcodeRules {
-    return [self passwordAnswerFormat].passwordRules;
-}
-
-- (void)setPasscodeRules:(UITextInputPasswordRules *)passcodeRules {
-    [self passwordAnswerFormat].passwordRules = passcodeRules;
 }
 
 - (NSRegularExpression *)phoneNumberValidationRegularExpression {

@@ -50,7 +50,7 @@
 @implementation ORKAudioRecorder
 
 - (void)dealloc {
-    ORK_Log_Debug("Remove audiorecorder %p", self);
+    ORK_Log_Debug(@"Remove audiorecorder %p", self);
     [_audioRecorder stop];
     _audioRecorder = nil;
 }
@@ -85,7 +85,7 @@
     if (_savedSessionCategory) {
         NSError *error;
         if (![[AVAudioSession sharedInstance] setCategory:_savedSessionCategory error:&error]) {
-            ORK_Log_Error("Failed to restore the audio session category: %@", [error localizedDescription]);
+            ORK_Log_Error(@"Failed to restore the audio session category: %@", [error localizedDescription]);
         }
         _savedSessionCategory = nil;
     }
@@ -113,7 +113,7 @@
             return;
         }
         
-        ORK_Log_Debug("Create audioRecorder %p", self);
+        ORK_Log_Debug(@"Create audioRecorder %p", self);
         _audioRecorder = [[AVAudioRecorder alloc]
                           initWithURL:soundFileURL
                           settings:self.recorderSettings
@@ -245,29 +245,29 @@
     return [[self recordingDirectoryURL] URLByAppendingPathComponent:[NSString stringWithFormat:@"%@.%@", [self logName], [self extension]]];
 }
 
-- (BOOL)recreateFileWithError:(NSError **)errorOut {
+- (BOOL)recreateFileWithError:(NSError **)error {
     NSURL *url = [self recordingFileURL];
     if (!url) {
-        if (errorOut != NULL) {
-            *errorOut = [NSError errorWithDomain:NSCocoaErrorDomain code:NSFileWriteInvalidFileNameError userInfo:@{NSLocalizedDescriptionKey:ORKLocalizedString(@"ERROR_RECORDER_NO_OUTPUT_DIRECTORY", nil)}];
+        if (error) {
+            *error = [NSError errorWithDomain:NSCocoaErrorDomain code:NSFileWriteInvalidFileNameError userInfo:@{NSLocalizedDescriptionKey:ORKLocalizedString(@"ERROR_RECORDER_NO_OUTPUT_DIRECTORY", nil)}];
         }
         return NO;
     }
     
     NSFileManager *fileManager = [NSFileManager defaultManager];
     
-    if (![fileManager createDirectoryAtURL:url withIntermediateDirectories:YES attributes:nil error:errorOut]) {
+    if (![fileManager createDirectoryAtURL:url withIntermediateDirectories:YES attributes:nil error:error]) {
         return NO;
     }
     
     if ([fileManager fileExistsAtPath:[url path]]) {
-        if (![fileManager removeItemAtPath:[url path] error:errorOut]) {
+        if (![fileManager removeItemAtPath:[url path] error:error]) {
             return NO;
         }
     }
     
     [fileManager createFileAtPath:[url path] contents:nil attributes:nil];
-    [fileManager setAttributes:@{NSFileProtectionKey: ORKFileProtectionFromMode(ORKFileProtectionCompleteUnlessOpen)} ofItemAtPath:[url path] error:errorOut];
+    [fileManager setAttributes:@{NSFileProtectionKey: ORKFileProtectionFromMode(ORKFileProtectionCompleteUnlessOpen)} ofItemAtPath:[url path] error:error];
     return YES;
 }
 

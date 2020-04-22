@@ -35,12 +35,11 @@
 
 #import "ORKHelpers_Internal.h"
 #import "ORKSkin.h"
-#import <WebKit/WebKit.h>
 
 
-@interface ORKConsentLearnMoreViewController () <WKNavigationDelegate>
+@interface ORKConsentLearnMoreViewController () <UIWebViewDelegate>
 
-@property (nonatomic, strong) WKWebView *webView;
+@property (nonatomic, strong) UIWebView *webView;
 @property (nonatomic, copy) NSString *content;
 @property (nonatomic, copy) NSURL *contentURL;
 
@@ -70,9 +69,8 @@
     [super viewDidLoad];
     
     self.view.backgroundColor = ORKColor(ORKBackgroundColorKey);
-  
-    WKWebViewConfiguration *webViewConfiguration = [WKWebViewConfiguration new];
-    _webView = [[WKWebView alloc] initWithFrame:self.view.bounds configuration:webViewConfiguration];
+    
+    _webView = [[UIWebView alloc] initWithFrame:self.view.bounds];
     
     const CGFloat horizMargin = ORKStandardLeftMarginForTableViewCell(self.view);
     _webView.backgroundColor = ORKColor(ORKBackgroundColorKey);
@@ -83,15 +81,15 @@
     _webView.scrollView.scrollIndicatorInsets = (UIEdgeInsets){.left = -horizMargin, .right = -horizMargin};
     _webView.opaque = NO; // If opaque is set to YES, _webView shows a black right margin during transition when modally presented. This is an artifact due to disabling clipsToBounds to be able to show the scroll indicator outside the view.
     
-    
-    _webView.navigationDelegate = self;
-    
     if (_contentURL) {
+        [_webView setScalesPageToFit:YES];
+        
         [_webView loadRequest:[NSURLRequest requestWithURL:_contentURL]];
     } else {
         [_webView loadHTMLString:self.content baseURL:ORKCreateRandomBaseURL()];
     }
     
+    _webView.delegate = self;
     [self.view addSubview:_webView];
     
     _webView.translatesAutoresizingMaskIntoConstraints = NO;
@@ -121,14 +119,12 @@
     [self.presentingViewController dismissViewControllerAnimated:YES completion:nil];
 }
 
-- (void)webView:(WKWebView *) __unused webView decidePolicyForNavigationAction:(WKNavigationAction *)navigationAction decisionHandler:(void (^)(WKNavigationActionPolicy))decisionHandler {
-    if (navigationAction.navigationType != WKNavigationTypeOther) {
-        [[UIApplication sharedApplication] openURL:navigationAction.request.URL options:@{} completionHandler:^(BOOL __unused success) {
-            decisionHandler(WKNavigationActionPolicyCancel);
-        }];
-    } else {
-        decisionHandler(WKNavigationActionPolicyAllow);
+- (BOOL)webView:(UIWebView *)webView shouldStartLoadWithRequest:(NSURLRequest *)request navigationType:(UIWebViewNavigationType)navigationType {
+    if (navigationType != UIWebViewNavigationTypeOther) {
+        [[UIApplication sharedApplication] openURL:request.URL];
+        return NO;
     }
+    return YES;
 }
 
 @end

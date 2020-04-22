@@ -51,7 +51,7 @@ NS_ASSUME_NONNULL_BEGIN
 
 @property (nonatomic, strong, nullable) id answer;
 
-@property (nonatomic, readonly, nullable) NSString *selectedLabelText;
+@property (nonatomic, readonly) NSString *selectedLabelText;
 
 - (void)pickerWillAppear;
 

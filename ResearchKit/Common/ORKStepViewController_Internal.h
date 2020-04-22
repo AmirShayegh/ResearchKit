@@ -29,16 +29,12 @@
  */
 
 
-#import <ResearchKit/ORKStepViewController.h>
+#import "ORKStepViewController.h"
 
 
 NS_ASSUME_NONNULL_BEGIN
 
-@class ORKNavigationContainerView;
-
-@interface ORKStepViewController () <UIViewControllerRestoration> {
-    @protected ORKNavigationContainerView *_navigationFooterView;
-}
+@interface ORKStepViewController () <UIViewControllerRestoration>
 
 - (void)stepDidChange;
 
@@ -46,6 +42,7 @@ NS_ASSUME_NONNULL_BEGIN
 @property (nonatomic, copy, readonly, nullable) NSArray <ORKResult *> *addedResults;
 
 @property (nonatomic, strong, nullable) UIBarButtonItem *internalContinueButtonItem;
+@property (nonatomic, strong, nullable) UIBarButtonItem *internalBackButtonItem;
 @property (nonatomic, strong, nullable) UIBarButtonItem *internalDoneButtonItem;
 
 @property (nonatomic, strong, nullable) UIBarButtonItem *internalSkipButtonItem;
@@ -59,7 +56,6 @@ NS_ASSUME_NONNULL_BEGIN
 
 @property (nonatomic, copy, nullable) NSString *restoredStepIdentifier;
 @property (nonatomic, assign) BOOL shouldIgnoreiPadDesign;
-@property (nonatomic) BOOL shouldPresentInReview;
 
 + (UIInterfaceOrientationMask)supportedInterfaceOrientations;
 
@@ -74,16 +70,19 @@ NS_ASSUME_NONNULL_BEGIN
 
 - (void)notifyDelegateOnResultChange;
 
-- (instancetype)initWithNibName:(nullable NSString *)nibNameOrNil bundle:(nullable NSBundle *)nibBundleOrNil NS_UNAVAILABLE;
+- (instancetype)initWithNibName:(NSString *)nibNameOrNil bundle:(NSBundle *)nibBundleOrNil NS_DESIGNATED_INITIALIZER;
 
-- (BOOL)showValidityAlertWithMessage:(NSString *)text;
+- (void)showValidityAlertWithMessage:(NSString *)text;
 
-- (BOOL)showValidityAlertWithTitle:(NSString *)title message:(NSString *)message;
+- (void)showValidityAlertWithTitle:(NSString *)title message:(NSString *)message;
 
 - (void)initializeInternalButtonItems;
 
-// internal method for updating the bar button items.
-- (void)updateBarButtonItems;
+// internal use version to set backButton, without override "_internalBackButtonItem"
+- (void)ork_setBackButtonItem:(nullable UIBarButtonItem *)backButton;
+
+// internal method for updating the right bar button item.
+- (void)updateNavLeftBarButtonItem;
 
 // Use this view to layout iPad Constraints.
 - (UIView *)viewForiPadLayoutConstraints;

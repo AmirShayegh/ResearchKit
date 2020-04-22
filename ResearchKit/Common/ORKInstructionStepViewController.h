@@ -47,8 +47,6 @@ NS_ASSUME_NONNULL_BEGIN
 ORK_CLASS_AVAILABLE
 @interface ORKInstructionStepViewController : ORKStepViewController
 
-- (void)buildInNextBodyItem;
-
 @end
 
 NS_ASSUME_NONNULL_END

@@ -47,11 +47,7 @@
                       resultSource:(id<ORKTaskResultSource, NSSecureCoding>)resultSource {
     self = [super initWithIdentifier:identifier];
     if (self) {
-        if (steps) {
-            _steps = [steps copy];
-        } else {
-            _steps = @[];
-        }
+        _steps = [steps copy];
         _resultSource = resultSource;
         _excludeInstructionSteps = NO;
     }
@@ -116,7 +112,7 @@
 }
 
 - (BOOL)isStandalone {
-    return _steps.count > 0;
+    return _steps != nil;
 }
 
 @end

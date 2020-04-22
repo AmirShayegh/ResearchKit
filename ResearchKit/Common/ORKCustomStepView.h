@@ -36,7 +36,6 @@
 NS_ASSUME_NONNULL_BEGIN
 
 @class ORKQuestionStepCustomView;
-@class ORKLearnMoreView;
 
 /**
  The `ORKQuestionStepCustomViewDelegate` protocol defines the methods that a question step custom view should implement.
@@ -84,7 +83,7 @@ ORK_CLASS_AVAILABLE
 
 @property (nonatomic, strong, nullable) ORKSurveyAnswerCell *cell;
 
-- (void)useCardViewWithTitle:(NSString *)title detailText:(nullable NSString *)detailText learnMoreView:(nullable ORKLearnMoreView *)learnMoreView progressText:(nullable NSString *)progressText tagText:(nullable NSString *)tagText hasMultipleChoiceFormItem:(BOOL)hasMultipleChoiceFormItem;
+- (void)useCardViewWithTitle:(NSString *)title;
 
 @end
 

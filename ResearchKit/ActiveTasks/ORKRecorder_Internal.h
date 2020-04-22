@@ -52,7 +52,7 @@ NS_ASSUME_NONNULL_BEGIN
 
 - (void)reset NS_REQUIRES_SUPER;
 
-- (void)reportFileResultWithFile:(nullable NSURL *)fileUrl error:(nullable NSError *)error;
+- (void)reportFileResultWithFile:(NSURL *)fileUrl error:(nullable NSError *)error;
 
 - (nullable NSURL *)recordingDirectoryURL;
 

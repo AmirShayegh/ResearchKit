@@ -235,7 +235,6 @@ ORK_CLASS_AVAILABLE
  
  @return A result predicate.
  */
-
 + (NSPredicate *)predicateForNilQuestionResultWithResultSelector:(ORKResultSelector *)resultSelector;
 
 /**
