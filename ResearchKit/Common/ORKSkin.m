@@ -263,6 +263,7 @@ CGFloat ORKGetMetricForWindow(ORKScreenMetric metric, UIWindow *window) {
         case ORKScreenMetricContinueButtonWidth:
         case ORKScreenMetricHeadlineSideMargin:
         case ORKScreenMetricLearnMoreButtonSideMargin:
+        case ORKScreenMetricVerticalScaleHeight:
             metricValue = ORKGetMetricForScreenType(metric, ORKGetHorizontalScreenTypeForWindow(window));
             break;
             
