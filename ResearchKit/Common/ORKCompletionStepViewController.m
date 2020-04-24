@@ -153,7 +153,7 @@ static const CGFloat TickViewSize = 122;
     if (self.checkmarkColor) {
         _completionStepView.tintColor = self.checkmarkColor;
     }
-    
+    self.stepView.verticalCenteringEnabled = true;
     self.stepView.stepView = _completionStepView;
 }
 
