@@ -33,6 +33,8 @@
 #import "ORKHTMLPDFPageRenderer.h"
 
 #import "ORKHelpers_Internal.h"
+#import <WebKit/WebKit.h>
+#import "WKWebView+ResearchKit.h"
 
 
 #define ORKPPI 72
@@ -47,13 +49,13 @@ static const CGFloat LetterHeight = 11.0f;
 
 
 
-@interface ORKHTMLPDFWriter () <UIWebViewDelegate> {
+@interface ORKHTMLPDFWriter () <WKNavigationDelegate> {
     id _selfRetain;
 }
 
 @property (nonatomic) CGSize pageSize;
 @property (nonatomic) UIEdgeInsets pageMargins;
-@property (nonatomic, strong) UIWebView *webView;
+@property (nonatomic, strong) WKWebView *webView;
 @property (nonatomic, strong) NSData *data;
 @property (nonatomic, copy) NSError *error;
 @property (nonatomic, copy) void (^completionBlock)(NSData *data, NSError *error);
@@ -67,7 +69,7 @@ static const CGFloat HeaderHeight = 25.0;
 static const CGFloat FooterHeight = 25.0;
 static const CGFloat PageEdge = 72.0 / 4;
 
-- (void)writePDFFromHTML:(NSString *)html withCompletionBlock:(void (^)(NSData *data, NSError *error))completionBlock {
+- (void)writePDFFromHTML:(NSString *)html completionBlock:(void (^)(NSData *data, NSError *error))completionBlock {
     
     _pageMargins = UIEdgeInsetsMake(PageEdge, PageEdge, PageEdge, PageEdge);
     _pageSize = [ORKHTMLPDFWriter defaultPageSize];
@@ -75,8 +77,8 @@ static const CGFloat PageEdge = 72.0 / 4;
     _data = nil;
     _error = nil;
     
-    self.webView = [[UIWebView alloc] init];
-    self.webView.delegate = self;
+    self.webView = [WKWebView createResearchKitWebViewWith:CGRectZero];
+    self.webView.navigationDelegate = self;
     [self.webView loadHTMLString:html baseURL:ORKCreateRandomBaseURL()];
     
     _selfRetain = self;
@@ -97,7 +99,7 @@ static const CGFloat PageEdge = 72.0 / 4;
     UIPrintFormatter *formatter = self.webView.viewPrintFormatter;
     
     ORKHTMLPDFPageRenderer *renderer = self.printRenderer;
-    if(renderer == nil) {
+    if (renderer == nil) {
         renderer = [[ORKHTMLPDFPageRenderer alloc] init];
         renderer.pageMargins = self.pageMargins;
         renderer.footerHeight = FooterHeight;
@@ -141,22 +143,25 @@ static const CGFloat PageEdge = 72.0 / 4;
     return pageSize;
 }
 
-#pragma mark - UIWebViewDelegate
+#pragma mark - WKNavigationDelegate
 
-- (void)webViewDidFinishLoad:(UIWebView *)webView {
-    NSString *readyState = [webView stringByEvaluatingJavaScriptFromString:@"document.readyState"];
-    BOOL complete = [readyState isEqualToString:@"complete"];
+- (void)webView:(WKWebView *)webView didFinishNavigation:(WKNavigation *)navigation {
+    __weak ORKHTMLPDFWriter *weakSelf = self;
+    [webView evaluateJavaScript:@"document.readyState" completionHandler:^(id _Nullable value, NSError * _Nullable error) {
+        BOOL complete = [[value description] isEqualToString:@"complete"];
+        
+        [[weakSelf class] cancelPreviousPerformRequestsWithTarget:self selector:@selector(timeout) object:nil];
+        
+        if (complete) {
+            [weakSelf savePDF];
+        } else {
+            [weakSelf performSelector:@selector(timeout) withObject:nil afterDelay:1.0f];
+        }
+    }];
     
-    [[self class] cancelPreviousPerformRequestsWithTarget:self selector:@selector(timeout) object:nil];
-    
-    if (complete) {
-        [self savePDF];
-    } else {
-        [self performSelector:@selector(timeout) withObject:nil afterDelay:1.0f];
-    }
 }
 
-- (void)webView:(UIWebView *)webView didFailLoadWithError:(NSError *)error {
+- (void)webView:(WKWebView *)webView didFailNavigation:(WKNavigation *)navigation withError:(NSError *)error {
     [[self class] cancelPreviousPerformRequestsWithTarget:self selector:@selector(timeout) object:nil];
     
     _error = error;
