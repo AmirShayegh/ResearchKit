@@ -106,11 +106,8 @@
         }
         
         id<ORKAnswerOption> choice = _choices[index];
-        ORKTextChoiceOther *textChoiceOther;
-        if ([choice isKindOfClass: [ORKTextChoiceOther class]]) {
-            textChoiceOther = (ORKTextChoiceOther *)choice;
-        }
-        id value = textChoiceOther.textViewText ? : choice.value;
+        id value = choice.value;
+        
         if (value == nil) {
             value = _isValuePicker ? @(index - 1) : @(index);
         }
@@ -139,38 +136,19 @@
     
     if (answer != nil && answer != ORKNullAnswerValue() ) {
         
-        if (![answer isKindOfClass:[ORKChoiceQuestionResult answerClass]]) {
-            @throw [NSException exceptionWithName:@"Wrong answer type"
-                                           reason:[NSString stringWithFormat:@"Expected answer type %@, but was given %@", [ORKChoiceQuestionResult answerClass], [answer class]]
-                                         userInfo:nil];
-        }
+        NSAssert([answer isKindOfClass:[ORKChoiceQuestionResult answerClass] ], @"Wrong answer type");
         
         for (id answerValue in (NSArray *)answer) {
             id<ORKAnswerOption> matchedChoice = nil;
             for ( id<ORKAnswerOption> choice in _choices) {
-                if ([choice isKindOfClass:[ORKTextChoiceOther class]]) {
-                    ORKTextChoiceOther *textChoiceOther = (ORKTextChoiceOther *)choice;
-                    if ([textChoiceOther.textViewText isEqual:answerValue]) {
-                        matchedChoice = choice;
-                        break;
-                    } else if (textChoiceOther.textViewInputOptional && textChoiceOther.textViewText.length <= 0 && [textChoiceOther.value isEqual:answerValue]) {
-                        matchedChoice = choice;
-                        break;
-                    }
-                } else if ([choice.value isEqual:answerValue]) {
+                if ([choice.value isEqual:answerValue]) {
                     matchedChoice = choice;
                     break;
                 }
             }
             
             if (nil == matchedChoice) {
-                
-                if (![answerValue isKindOfClass:[NSNumber class]]) {
-                    @throw [NSException exceptionWithName:@"No matching choice found"
-                                                   reason:[NSString stringWithFormat:@"Provided choice of type %@ not found in available choices", [answerValue class]]
-                                                 userInfo:nil];
-                }
-                
+                NSAssert([answerValue isKindOfClass:[NSNumber class]], @"");
                 if (_isValuePicker) {
                     matchedChoice = _choices[((NSNumber *)answerValue).unsignedIntegerValue + 1];
                 } else {

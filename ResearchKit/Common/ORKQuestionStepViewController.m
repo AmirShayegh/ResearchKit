@@ -31,10 +31,8 @@
 
 #import "ORKQuestionStepViewController_Private.h"
 
-#import "ORKChoiceViewCell_Internal.h"
+#import "ORKChoiceViewCell.h"
 #import "ORKQuestionStepView.h"
-#import "ORKLearnMoreView.h"
-#import "ORKLearnMoreStepViewController.h"
 #import "ORKStepHeaderView_Internal.h"
 #import "ORKSurveyAnswerCellForScale.h"
 #import "ORKSurveyAnswerCellForNumber.h"
@@ -42,11 +40,9 @@
 #import "ORKSurveyAnswerCellForPicker.h"
 #import "ORKSurveyAnswerCellForImageSelection.h"
 #import "ORKSurveyAnswerCellForLocation.h"
-#import "ORKSurveyAnswerCellForSES.h"
 #import "ORKTableContainerView.h"
 #import "ORKSurveyCardHeaderView.h"
 #import "ORKTextChoiceCellGroup.h"
-#import "ORKBodyItem.h"
 
 #import "ORKNavigationContainerView_Internal.h"
 #import "ORKStepViewController_Internal.h"
@@ -58,7 +54,6 @@
 #import "ORKQuestionStep_Internal.h"
 #import "ORKResult_Private.h"
 #import "ORKStep_Private.h"
-#import "ORKStepContentView.h"
 
 #import "ORKHelpers_Internal.h"
 #import "ORKSkin.h"
@@ -69,13 +64,13 @@ typedef NS_ENUM(NSInteger, ORKQuestionSection) {
     ORKQuestionSection_COUNT
 };
 
-static const CGFloat DelayBeforeAutoScroll = 0.25;
 
-@interface ORKQuestionStepViewController () <UITableViewDataSource, UITableViewDelegate, ORKSurveyAnswerCellDelegate, ORKTextChoiceCellGroupDelegate, ORKChoiceOtherViewCellDelegate, ORKTableContainerViewDelegate, ORKLearnMoreViewDelegate> {
+@interface ORKQuestionStepViewController () <UITableViewDataSource,UITableViewDelegate, ORKSurveyAnswerCellDelegate> {
     id _answer;
     
     ORKTableContainerView *_tableContainer;
-    ORKStepContentView *_headerView;
+    ORKStepHeaderView *_headerView;
+    ORKNavigationContainerView *_navigationFooterView;
     ORKAnswerDefaultSource *_defaultSource;
     
     NSCalendar *_savedSystemCalendar;
@@ -87,7 +82,6 @@ static const CGFloat DelayBeforeAutoScroll = 0.25;
     id _defaultAnswer;
     
     BOOL _visible;
-    UITableViewCell *_currentFirstResponderCell;
 }
 
 @property (nonatomic, strong) UITableView *tableView;
@@ -154,6 +148,7 @@ static const CGFloat DelayBeforeAutoScroll = 0.25;
     if ([self isViewLoaded]) {
         BOOL neediPadDesign = ORKNeedWideScreenDesign(self.view);
         [_tableContainer removeFromSuperview];
+        [_navigationFooterView removeFromSuperview];
         _tableView.delegate = nil;
         _tableView.dataSource = nil;
         _tableView = nil;
@@ -162,9 +157,16 @@ static const CGFloat DelayBeforeAutoScroll = 0.25;
         _navigationFooterView = nil;
         [_questionView removeFromSuperview];
         _questionView = nil;
+        
+        _navigationFooterView = [ORKNavigationContainerView new];
+        _navigationFooterView.skipButtonItem = self.skipButtonItem;
+        _navigationFooterView.continueEnabled = [self continueButtonEnabled];
+        _navigationFooterView.continueButtonItem = self.continueButtonItem;
+        _navigationFooterView.cancelButtonItem = self.cancelButtonItem;
 
+        [self.view addSubview:_navigationFooterView];
         if ([self.questionStep formatRequiresTableView] && !_customQuestionView) {
-            _tableContainer = [[ORKTableContainerView alloc] initWithStyle:UITableViewStyleGrouped pinNavigationContainer:NO];
+            _tableContainer = [ORKTableContainerView new];
             
             // Create a new one (with correct style)
             _tableView = _tableContainer.tableView;
@@ -172,32 +174,24 @@ static const CGFloat DelayBeforeAutoScroll = 0.25;
             _tableView.dataSource = self;
             _tableView.clipsToBounds = YES;
             
-            _navigationFooterView = _tableContainer.navigationFooterView;
-            [self setNavigationFooterButtonItems];
-            
-            [self.view addSubview:_tableContainer];
+            [self.view insertSubview:_tableContainer belowSubview:_navigationFooterView];
             _tableContainer.tapOffView = self.view;
             
-            _headerView = _tableContainer.stepContentView;
+            _headerView = _tableContainer.stepHeaderView;
+            _headerView.captionLabel.useSurveyMode = self.step.useSurveyMode;
             if (self.questionStep.useCardView) {
                 _tableView.separatorStyle = UITableViewCellSeparatorStyleNone;
-                if (@available(iOS 13.0, *)) {
-                    [_tableView setBackgroundColor:UIColor.systemGroupedBackgroundColor];
-                } else {
-                    [_tableView setBackgroundColor:ORKColor(ORKBackgroundColorKey)];
-                }
+                [_tableView setBackgroundColor:ORKColor(ORKBackgroundColorKey)];
                 [self.taskViewController.navigationBar setBarTintColor:[UIColor colorWithRed:0.00 green:0.42 blue:0.91 alpha:1.0]];
                 [self.view setBackgroundColor:[_tableView backgroundColor]];
             }
+            else {
+                _headerView.captionLabel.text = self.questionStep.question;
+            }
+            _headerView.instructionLabel.text = self.questionStep.text;
+            _headerView.learnMoreButtonItem = self.learnMoreButtonItem;
             
-            _headerView.stepTopContentImage = self.step.image;
-            _headerView.titleIconImage = self.step.iconImage;
-            _headerView.stepTitle = self.step.title;
-            _headerView.stepText = self.step.text;
-            // TODO:- we are currently not setting detailText to _headerView because we are restricting detailText to be displayed only inside ORKSurveyCardHeaderView, might wanna rethink this later. Please use the text property on ORKQuestionStep for adding extra information.
-            _headerView.stepHeaderTextAlignment = self.step.headerTextAlignment;
-            _headerView.bodyItems = self.step.bodyItems;
-            _tableContainer.stepTopContentImageContentMode = self.step.imageContentMode;
+
             _navigationFooterView.optional = self.step.optional;
             if (self.readOnlyMode) {
                 _navigationFooterView.optional = YES;
@@ -211,32 +205,18 @@ static const CGFloat DelayBeforeAutoScroll = 0.25;
             }
             [self setupConstraints:_tableContainer];
             [_tableContainer setNeedsLayout];
-            
-            // Question steps should always force the navigation controller to be scrollable
-            // therefore we should always remove the styling.
-            [_navigationFooterView removeStyling];
         } else if (self.step) {
             _questionView = [ORKQuestionStepView new];
-            ORKQuestionStep *questionStep = (ORKQuestionStep *)self.step;
-            
-            if (questionStep && questionStep.questionType == ORKQuestionTypeScale) {
-                id<ORKScaleAnswerFormatProvider> formatProvider = (id<ORKScaleAnswerFormatProvider>)[questionStep impliedAnswerFormat];
-                
-                if (formatProvider && [formatProvider isVertical]) {
-                   [_questionView placeNavigationContainerInsideScrollView];
-                }
-            }
+            _questionView.keyboardDismissMode = UIScrollViewKeyboardDismissModeInteractive;
             
             ORKQuestionStep *step = [self questionStep];
-            _navigationFooterView = _questionView.navigationFooterView;
-            [self setNavigationFooterButtonItems];
             _navigationFooterView.useNextForSkip = (step ? NO : YES);
             _questionView.questionStep = step;
             _navigationFooterView.optional = step.optional;
             [_navigationFooterView updateContinueAndSkipEnabled];
             
-            [self.view addSubview:_questionView];
-
+            [self.view insertSubview:_questionView belowSubview:_navigationFooterView];
+            
             if (_customQuestionView) {
                 _questionView.questionCustomView = _customQuestionView;
                 _customQuestionView.delegate = self;
@@ -251,42 +231,16 @@ static const CGFloat DelayBeforeAutoScroll = 0.25;
                 _cellHolderView.answer = [self answer];
                 _cellHolderView.userInteractionEnabled = !self.readOnlyMode;
                 if (self.questionStep.useCardView) {
-                    if (@available(iOS 13.0, *)) {
-                        [_questionView setBackgroundColor:UIColor.systemGroupedBackgroundColor];
-                    } else {
-                        [_questionView setBackgroundColor:ORKColor(ORKBackgroundColorKey)];
-                    }
+                    [_questionView setBackgroundColor:ORKColor(ORKBackgroundColorKey)];
                     [self.taskViewController.navigationBar setBarTintColor:[UIColor colorWithRed:0.00 green:0.42 blue:0.91 alpha:1.0]];
                     [self.view setBackgroundColor:[_questionView backgroundColor]];
-                    ORKLearnMoreView *learnMoreView;
-                    NSString *sectionProgressText = nil;
-                    
-                    if (self.step.showsProgress) {
-                        if ([self.delegate respondsToSelector:@selector(stepViewControllerTotalProgressInfoForStep:currentStep:)]) {
-                            ORKTaskTotalProgress progressInfo = [self.delegate stepViewControllerTotalProgressInfoForStep:self currentStep:self.step];
-                            if (progressInfo.stepShouldShowTotalProgress) {
-                                sectionProgressText = [NSString localizedStringWithFormat:ORKLocalizedString(@"FORM_ITEM_PROGRESS", nil) ,ORKLocalizedStringFromNumber(@(progressInfo.currentStepStartingProgressPosition)), ORKLocalizedStringFromNumber(@(progressInfo.total))];
-                            }
-                        }
-                    }
-                    
-                    if (self.questionStep.learnMoreItem) {
-                        learnMoreView = [ORKLearnMoreView learnMoreViewWithItem:self.questionStep.learnMoreItem];
-                        learnMoreView.delegate = self;
-                    }
-                    
-                    BOOL hasMultipleChoiceFormItem = NO;
-                    if (self.questionStep.impliedAnswerFormat != nil && self.questionStep.impliedAnswerFormat.questionType == ORKQuestionTypeMultipleChoice) {
-                        hasMultipleChoiceFormItem = YES;
-                    }
-                    
-                    [_cellHolderView useCardViewWithTitle:self.questionStep.question detailText:self.step.detailText learnMoreView:learnMoreView progressText:sectionProgressText tagText:self.questionStep.tagText hasMultipleChoiceFormItem:hasMultipleChoiceFormItem];
+                    [_cellHolderView useCardViewWithTitle:self.questionStep.question];
                 }
                 _questionView.questionCustomView = _cellHolderView;
             }
             
             _questionView.translatesAutoresizingMaskIntoConstraints = NO;
-            [_questionView removeCustomContentPadding];
+            _questionView.headerView.learnMoreButtonItem = self.learnMoreButtonItem;
             
             if (self.readOnlyMode) {
                 _navigationFooterView.optional = YES;
@@ -304,63 +258,98 @@ static const CGFloat DelayBeforeAutoScroll = 0.25;
     if ([self allowContinue] == NO) {
         self.continueButtonItem  = self.internalContinueButtonItem;
     }
-}
-
-- (void)setNavigationFooterButtonItems {
-    if (_navigationFooterView) {
-        _navigationFooterView.skipButtonItem = self.skipButtonItem;
-        _navigationFooterView.continueEnabled = [self continueButtonEnabled];
-        _navigationFooterView.continueButtonItem = self.continueButtonItem;
-    }
-}
-
-- (void)viewDidLayoutSubviews {
-    [super viewDidLayoutSubviews];
-    if (_tableContainer) {
-        [_tableContainer sizeHeaderToFit];
-        [_tableContainer resizeFooterToFit];
-    }
+    
 }
 
 - (void)setupConstraints:(UIView *)view {
     if (_constraints) {
         [NSLayoutConstraint deactivateConstraints:_constraints];
     }
-
     view.translatesAutoresizingMaskIntoConstraints = NO;
+    _navigationFooterView.translatesAutoresizingMaskIntoConstraints = NO;
     _constraints = nil;
+    UIView *viewForiPad = [self viewForiPadLayoutConstraints];
 
     _constraints = @[
                      [NSLayoutConstraint constraintWithItem:view
                                                   attribute:NSLayoutAttributeTop
                                                   relatedBy:NSLayoutRelationEqual
-                                                     toItem:self.view
+                                                     toItem:viewForiPad ? : self.view.safeAreaLayoutGuide
                                                   attribute:NSLayoutAttributeTop
                                                  multiplier:1.0
                                                    constant:0.0],
                      [NSLayoutConstraint constraintWithItem:view
+                                                  attribute:NSLayoutAttributeLeftMargin
+                                                  relatedBy:NSLayoutRelationEqual
+                                                     toItem:viewForiPad ? : self.view.safeAreaLayoutGuide
+                                                  attribute:NSLayoutAttributeLeftMargin
+                                                 multiplier:1.0
+                                                   constant:ORKSurveyTableContainerLeftRightPadding],
+                     [NSLayoutConstraint constraintWithItem:view
+                                                  attribute:NSLayoutAttributeRightMargin
+                                                  relatedBy:NSLayoutRelationEqual
+                                                     toItem:viewForiPad ? : self.view.safeAreaLayoutGuide
+                                                  attribute:NSLayoutAttributeRightMargin
+                                                 multiplier:1.0
+                                                   constant:-ORKSurveyTableContainerLeftRightPadding],
+                     [NSLayoutConstraint constraintWithItem:_navigationFooterView
+                                                  attribute:NSLayoutAttributeBottom
+                                                  relatedBy:NSLayoutRelationEqual
+                                                     toItem:viewForiPad ? : self.view
+                                                  attribute:NSLayoutAttributeBottom
+                                                 multiplier:1.0
+                                                   constant:0.0],
+                     [NSLayoutConstraint constraintWithItem:_navigationFooterView
                                                   attribute:NSLayoutAttributeLeft
                                                   relatedBy:NSLayoutRelationEqual
-                                                     toItem:self.view
+                                                     toItem:viewForiPad ? : self.view
                                                   attribute:NSLayoutAttributeLeft
                                                  multiplier:1.0
                                                    constant:0.0],
-                     [NSLayoutConstraint constraintWithItem:view
+                     [NSLayoutConstraint constraintWithItem:_navigationFooterView
                                                   attribute:NSLayoutAttributeRight
                                                   relatedBy:NSLayoutRelationEqual
-                                                     toItem:self.view
+                                                     toItem:viewForiPad ? : self.view
                                                   attribute:NSLayoutAttributeRight
                                                  multiplier:1.0
                                                    constant:0.0],
                      [NSLayoutConstraint constraintWithItem:view
                                                   attribute:NSLayoutAttributeBottom
                                                   relatedBy:NSLayoutRelationEqual
-                                                     toItem:self.view
-                                                  attribute:NSLayoutAttributeBottom
+                                                     toItem:_navigationFooterView
+                                                  attribute:NSLayoutAttributeTop
                                                  multiplier:1.0
                                                    constant:0.0]
                      ];
     [NSLayoutConstraint activateConstraints:_constraints];
+    [self setupCellHolderViewConstraints];
+}
+
+- (void)setupCellHolderViewConstraints {
+    UIView *viewForiPad = [self viewForiPadLayoutConstraints];
+    if (_cellHolderView) {
+        NSArray *cellHolderConstraints = @[
+                                           
+                                           [NSLayoutConstraint constraintWithItem:_cellHolderView
+                                                                        attribute:NSLayoutAttributeLeftMargin
+                                                                        relatedBy:NSLayoutRelationEqual
+                                                                           toItem:viewForiPad ? : self.view.safeAreaLayoutGuide
+                                                                        attribute:NSLayoutAttributeLeftMargin
+                                                                       multiplier:1.0
+                                                                         constant:ORKSurveyTableContainerLeftRightPadding],
+                                           [NSLayoutConstraint constraintWithItem:_cellHolderView
+                                                                        attribute:NSLayoutAttributeRightMargin
+                                                                        relatedBy:NSLayoutRelationEqual
+                                                                           toItem:viewForiPad ? : self.view.safeAreaLayoutGuide
+                                                                        attribute:NSLayoutAttributeRightMargin
+                                                                       multiplier:1.0
+                                                                         constant:-ORKSurveyTableContainerLeftRightPadding]
+                                           ];
+        for (NSLayoutConstraint *constraint in cellHolderConstraints) {
+            constraint.priority = UILayoutPriorityRequired;
+        }
+        [NSLayoutConstraint activateConstraints:cellHolderConstraints];
+    }
 }
 
 - (void)viewDidLoad {
@@ -368,17 +357,15 @@ static const CGFloat DelayBeforeAutoScroll = 0.25;
     
     [self stepDidChange];
     
-    [NSNotificationCenter.defaultCenter addObserver:self selector:@selector(keyboardWillShow:) name:UIKeyboardWillShowNotification object:nil];
-    [NSNotificationCenter.defaultCenter addObserver:self selector:@selector(keyboardWillHide:) name:UIKeyboardWillHideNotification object:nil];
 }
 
-- (BOOL)showValidityAlertWithMessage:(NSString *)text {
+- (void)showValidityAlertWithMessage:(NSString *)text {
     // Ignore if our answer is null
     if (self.answer == ORKNullAnswerValue()) {
-        return NO;
+        return;
     }
     
-    return [super showValidityAlertWithMessage:text];
+    [super showValidityAlertWithMessage:text];
 }
 
 - (void)viewWillAppear:(BOOL)animated {
@@ -387,7 +374,9 @@ static const CGFloat DelayBeforeAutoScroll = 0.25;
     if (_tableView) {
         [self.taskViewController setRegisteredScrollView:_tableView];
     }
-    
+    if (_questionView) {
+        [self.taskViewController setRegisteredScrollView:_questionView];
+    }
     
     NSMutableSet *types = [NSMutableSet set];
     ORKAnswerFormat *format = [[self questionStep] answerFormat];
@@ -414,15 +403,7 @@ static const CGFloat DelayBeforeAutoScroll = 0.25;
         [self refreshDefaults];
     }
     
-    if (_tableContainer) {
-        [_tableContainer sizeHeaderToFit];
-        [_tableContainer resizeFooterToFit];
-        [_tableContainer layoutIfNeeded];
-    }
-    
-    if (_tableView) {
-        [_tableView reloadData];
-    }
+    [_tableContainer layoutIfNeeded];
 }
 
 - (void)answerDidChange {
@@ -448,7 +429,7 @@ static const CGFloat DelayBeforeAutoScroll = 0.25;
                 [self defaultAnswerDidChange];
             });
         } else {
-            ORK_Log_Error("Error fetching default: %@", error);
+            ORK_Log_Warning(@"Error fetching default: %@", error);
         }
     }];
 }
@@ -465,11 +446,15 @@ static const CGFloat DelayBeforeAutoScroll = 0.25;
 - (void)viewDidAppear:(BOOL)animated {
     [super viewDidAppear:animated];
     
+    // Delay creating the date picker until the view has appeared (to avoid animation stutter)
+    ORKSurveyAnswerCellForPicker *cell = (ORKSurveyAnswerCellForPicker *)[(ORKQuestionStepCellHolderView *)_questionView.questionCustomView cell];
+    if ([cell isKindOfClass:[ORKSurveyAnswerCellForPicker class]]) {
+        [cell loadPicker];
+    }
+    
     _visible = YES;
     
     UIAccessibilityPostNotification(UIAccessibilityScreenChangedNotification, nil);
-    // TODO: Remove reloadData later.
-    [_tableView reloadData];
 }
 
 - (void)viewWillDisappear:(BOOL)animated {
@@ -485,6 +470,14 @@ static const CGFloat DelayBeforeAutoScroll = 0.25;
         _customQuestionView.translatesAutoresizingMaskIntoConstraints = NO;
 
         CGSize requiredSize = [_customQuestionView sizeThatFits:(CGSize){self.view.bounds.size.width, CGFLOAT_MAX}];
+        
+        NSLayoutConstraint *widthConstraint = [NSLayoutConstraint constraintWithItem:_customQuestionView
+                                                                           attribute:NSLayoutAttributeWidth
+                                                                           relatedBy:NSLayoutRelationEqual
+                                                                              toItem:nil
+                                                                           attribute:NSLayoutAttributeNotAnAttribute
+                                                                          multiplier:1.0
+                                                                            constant:requiredSize.width];
         NSLayoutConstraint *heightConstraint = [NSLayoutConstraint constraintWithItem:_customQuestionView
                                                                             attribute:NSLayoutAttributeHeight
                                                                             relatedBy:NSLayoutRelationEqual
@@ -493,8 +486,9 @@ static const CGFloat DelayBeforeAutoScroll = 0.25;
                                                                            multiplier:1.0
                                                                              constant:requiredSize.height];
         
+        widthConstraint.priority = UILayoutPriorityDefaultLow;
         heightConstraint.priority = UILayoutPriorityDefaultLow;
-        [NSLayoutConstraint activateConstraints:@[heightConstraint]];
+        [NSLayoutConstraint activateConstraints:@[widthConstraint, heightConstraint]];
     }
     [self stepDidChange];
 }
@@ -513,6 +507,17 @@ static const CGFloat DelayBeforeAutoScroll = 0.25;
     [super setContinueButtonItem:continueButtonItem];
     _navigationFooterView.continueButtonItem = continueButtonItem;
     [self updateButtonStates];
+}
+
+- (void)setLearnMoreButtonItem:(UIBarButtonItem *)learnMoreButtonItem {
+    [super setLearnMoreButtonItem:learnMoreButtonItem];
+    _headerView.learnMoreButtonItem = self.learnMoreButtonItem;
+    _questionView.headerView.learnMoreButtonItem = self.learnMoreButtonItem;
+}
+
+- (void)setCancelButtonItem:(UIBarButtonItem *)cancelButtonItem {
+    [super setCancelButtonItem:cancelButtonItem];
+    _navigationFooterView.cancelButtonItem = cancelButtonItem;
 }
 
 - (void)setSkipButtonItem:(UIBarButtonItem *)skipButtonItem {
@@ -577,17 +582,17 @@ static const CGFloat DelayBeforeAutoScroll = 0.25;
     ORKSurveyAnswerCell *cell = self.answerCell;
     cell.answer = ORKNullAnswerValue();
     
-    //    [super skipForward];
+//    [super skipForward];
     UIAlertController *alert = [UIAlertController alertControllerWithTitle: ORKLocalizedString(@"CONFIRM_SKIP_QUESTION_ALERT_MESSAGE", nil) // ORKLocalizedString(@"CONFIRM_SKIP_QUESTION_ALERT_TITLE", nil)
-                                                                   message: nil //ORKLocalizedString(@"CONFIRM_SKIP_QUESTION_ALERT_MESSAGE", nil)
-                                                            preferredStyle: UIAlertControllerStyleAlert];
-    
+    message: nil //ORKLocalizedString(@"CONFIRM_SKIP_QUESTION_ALERT_MESSAGE", nil)
+    preferredStyle: UIAlertControllerStyleAlert];
+
     [alert addAction:[UIAlertAction actionWithTitle:ORKLocalizedString(@"BUTTON_CANCEL", nil) style:UIAlertActionStyleDefault handler:nil]];
     [alert addAction:[UIAlertAction actionWithTitle:ORKLocalizedString(@"CONFIRM_SKIP_BUTTON", nil) style:UIAlertActionStyleDefault handler:^(UIAlertAction *action) {
-        // Have to dispatch, so following transition animation works
-        dispatch_async(dispatch_get_main_queue(), ^{
-            [super skipForward];
-        });
+            // Have to dispatch, so following transition animation works
+            dispatch_async(dispatch_get_main_queue(), ^{
+                   [super skipForward];
+                });
     }]];
 
     [self presentViewController:alert animated:YES completion:nil];
@@ -648,37 +653,12 @@ static const CGFloat DelayBeforeAutoScroll = 0.25;
 // Not to use `ImmediateNavigation` when current step already has an answer.
 // So user is able to review the answer when it is present.
 - (BOOL)isStepImmediateNavigation {
-    // FIXME: - add explicit property in QuestionStep to dictate this behavior
-//    return [self.questionStep isFormatImmediateNavigation] && [self hasAnswer] == NO && !self.isBeingReviewed;
-    return NO;
-}
-
-#pragma mark NSNotification methods
-
-- (void)keyboardWillShow:(NSNotification *)notification {
-    
-    CGRect keyboardFrame = [[[notification userInfo] objectForKey:UIKeyboardFrameEndUserInfoKey] CGRectValue];
-    CGRect convertedKeyboardFrame = [self.view convertRect:keyboardFrame fromView:nil];
-    
-    if (CGRectGetMaxY(_currentFirstResponderCell.frame) >= CGRectGetMinY(convertedKeyboardFrame)) {
-        
-        [self.tableView setContentInset:UIEdgeInsetsMake(0, 0, CGRectGetHeight(convertedKeyboardFrame) - CGRectGetHeight(_currentFirstResponderCell.frame), 0)];
-        
-        NSIndexPath *currentFirstResponderCellIndex = [self.tableView indexPathForCell:_currentFirstResponderCell];
-        
-        if (currentFirstResponderCellIndex) {
-            [self.tableView scrollToRowAtIndexPath:currentFirstResponderCellIndex atScrollPosition:UITableViewScrollPositionBottom animated:YES];
-        }
-    }
-}
-
-- (void)keyboardWillHide:(NSNotification *)notification {
-    [self.tableView setContentInset:UIEdgeInsetsZero];
+    return [self.questionStep isFormatImmediateNavigation] && [self hasAnswer] == NO && !self.isBeingReviewed;
 }
 
 #pragma mark - ORKQuestionStepCustomViewDelegate
 
-- (void)customQuestionStepView:(ORKQuestionStepCustomView *)customQuestionStepView didChangeAnswer:(id)answer {
+- (void)customQuestionStepView:(ORKQuestionStepCustomView *)customQuestionStepView didChangeAnswer:(id)answer; {
     [self saveAnswer:answer];
     self.hasChangedAnswer = YES;
 }
@@ -690,31 +670,8 @@ static const CGFloat DelayBeforeAutoScroll = 0.25;
 }
 
 - (UIView *)tableView:(UITableView *)tableView viewForHeaderInSection:(NSInteger)section {
-    
     if ([self questionStep].useCardView && [self questionStep].question) {
-        ORKLearnMoreView *learnMoreView;
-        NSString *sectionProgressText = nil;
-        BOOL hasMultipleChoiceFormItem = NO;
-        
-        if (self.step.showsProgress) {
-            if ([self.delegate respondsToSelector:@selector(stepViewControllerTotalProgressInfoForStep:currentStep:)]) {
-                ORKTaskTotalProgress progressInfo = [self.delegate stepViewControllerTotalProgressInfoForStep:self currentStep:self.step];
-                if (progressInfo.stepShouldShowTotalProgress) {
-                    sectionProgressText = [NSString localizedStringWithFormat:ORKLocalizedString(@"FORM_ITEM_PROGRESS", nil) ,ORKLocalizedStringFromNumber(@(section + progressInfo.currentStepStartingProgressPosition)), ORKLocalizedStringFromNumber(@(progressInfo.total))];
-                }
-            }
-        }
-        
-        if (self.questionStep.learnMoreItem) {
-            learnMoreView = [ORKLearnMoreView learnMoreViewWithItem:self.questionStep.learnMoreItem];
-            learnMoreView.delegate = self;
-        }
-        
-        if (self.questionStep.impliedAnswerFormat != nil && self.questionStep.impliedAnswerFormat.questionType == ORKQuestionTypeMultipleChoice) {
-            hasMultipleChoiceFormItem = YES;
-        }
-
-        return [[ORKSurveyCardHeaderView alloc] initWithTitle:self.questionStep.question detailText:self.questionStep.detailText  learnMoreView:learnMoreView progressText:sectionProgressText tagText:self.questionStep.tagText showBorder:NO hasMultipleChoiceItem:hasMultipleChoiceFormItem];
+        return [[ORKSurveyCardHeaderView alloc] initWithTitle:self.questionStep.question];
     }
     return nil;
 }
@@ -723,13 +680,10 @@ static const CGFloat DelayBeforeAutoScroll = 0.25;
     ORKAnswerFormat *impliedAnswerFormat = [_answerFormat impliedAnswerFormat];
     
     if (section == ORKQuestionSectionAnswer) {
-        if (!_choiceCellGroup) {
-            _choiceCellGroup = [[ORKTextChoiceCellGroup alloc] initWithTextChoiceAnswerFormat:(ORKTextChoiceAnswerFormat *)impliedAnswerFormat
-                                                                                       answer:self.answer
-                                                                           beginningIndexPath:[NSIndexPath indexPathForRow:0 inSection:section]
-                                                                          immediateNavigation:[self isStepImmediateNavigation]];
-            _choiceCellGroup.delegate = self;
-        }
+        _choiceCellGroup = [[ORKTextChoiceCellGroup alloc] initWithTextChoiceAnswerFormat:(ORKTextChoiceAnswerFormat *)impliedAnswerFormat
+                                                                                   answer:self.answer
+                                                                       beginningIndexPath:[NSIndexPath indexPathForRow:0 inSection:section]
+                                                                      immediateNavigation:[self isStepImmediateNavigation]];
         return _choiceCellGroup.size;
     }
     return 0;
@@ -752,8 +706,7 @@ static const CGFloat DelayBeforeAutoScroll = 0.25;
                                @(ORKQuestionTypeWeight) : [ORKSurveyAnswerCellForPicker class],
                                @(ORKQuestionTypeMultiplePicker) : [ORKSurveyAnswerCellForPicker class],
                                @(ORKQuestionTypeInteger): [ORKSurveyAnswerCellForNumber class],
-                               @(ORKQuestionTypeLocation): [ORKSurveyAnswerCellForLocation class],
-                               @(ORKQuestionTypeSES): [ORKSurveyAnswerCellForSES class]};
+                               @(ORKQuestionTypeLocation): [ORKSurveyAnswerCellForLocation class]};
     });
     
     // SingleSelectionPicker Cell && Other Cells
@@ -809,16 +762,9 @@ static const CGFloat DelayBeforeAutoScroll = 0.25;
     identifier = [NSStringFromClass([self class]) stringByAppendingFormat:@"%@", @(indexPath.row)];
     
     ORKChoiceViewCell *cell = [tableView dequeueReusableCellWithIdentifier:identifier];
-    if (!cell) {
-        cell = [_choiceCellGroup cellAtIndexPath:indexPath withReuseIdentifier:identifier];
-    }
     
-    if ([cell isKindOfClass:[ORKChoiceOtherViewCell class]]) {
-        ORKChoiceOtherViewCell *otherCell = (ORKChoiceOtherViewCell *)cell;
-        otherCell.delegate = self;
-        cell = otherCell;
-    }
-
+    cell = [_choiceCellGroup cellAtIndexPath:indexPath withReuseIdentifier:identifier];
+    
     cell.useCardView = self.questionStep.useCardView;
     cell.userInteractionEnabled = !self.readOnlyMode;
     
@@ -869,11 +815,6 @@ static const CGFloat DelayBeforeAutoScroll = 0.25;
     }
 }
 
-- (void)setShouldPresentInReview:(BOOL)shouldPresentInReview {
-    [super setShouldPresentInReview:shouldPresentInReview];
-    [_navigationFooterView setHidden:YES];
-}
-
 #pragma mark - UITableViewDelegate
 
 - (NSIndexPath *)tableView:(UITableView *)tableView willSelectRowAtIndexPath:(NSIndexPath *)indexPath {
@@ -893,11 +834,21 @@ static const CGFloat DelayBeforeAutoScroll = 0.25;
 - (void)tableView:(UITableView *)tableView didSelectRowAtIndexPath:(NSIndexPath *)indexPath {
     [tableView deselectRowAtIndexPath:indexPath animated:YES];
     
-    if (_choiceCellGroup.answerFormat.style == ORKChoiceAnswerStyleSingleChoice && ![self hasAnswer]) {
-         [self.tableView scrollRectToVisible:[self.tableView convertRect:self.tableView.tableFooterView.bounds fromView:self.tableView.tableFooterView] animated:YES];
-     }
-    
     [_choiceCellGroup didSelectCellAtIndexPath:indexPath];
+    
+    // Capture `isStepImmediateNavigation` before saving an answer.
+    BOOL immediateNavigation = [self isStepImmediateNavigation];
+    
+    id answer = (self.questionStep.questionType == ORKQuestionTypeBoolean) ? [_choiceCellGroup answerForBoolean] :[_choiceCellGroup answer];
+    
+    [self saveAnswer:answer];
+    self.hasChangedAnswer = YES;
+    
+    if (immediateNavigation) {
+        // Proceed as continueButton tapped
+        ORKSuppressPerformSelectorWarning(
+                                         [self.continueButtonItem.target performSelector:self.continueButtonItem.action withObject:self.continueButtonItem];);
+    }
 }
 
 - (CGFloat)tableView:(UITableView *)tableView heightForRowAtIndexPath:(NSIndexPath *)indexPath {
@@ -907,7 +858,7 @@ static const CGFloat DelayBeforeAutoScroll = 0.25;
         case ORKQuestionTypeSingleChoice:
         case ORKQuestionTypeMultipleChoice:{
             if ([self.questionStep isFormatFitsChoiceCells]) {
-                return UITableViewAutomaticDimension;
+                height = [self heightForChoiceItemOptionAtIndex:indexPath.row];
             } else {
                 height = [ORKSurveyAnswerCellForPicker suggestedCellHeightForView:tableView];
             }
@@ -937,6 +888,11 @@ static const CGFloat DelayBeforeAutoScroll = 0.25;
     return height;
 }
 
+- (CGFloat)heightForChoiceItemOptionAtIndex:(NSInteger)index {
+    ORKTextChoice *option = [(ORKTextChoiceAnswerFormat *)_answerFormat textChoices][index];
+    CGFloat height = [ORKChoiceViewCell suggestedCellHeightForShortText:option.text LongText:option.detailText inTableView:_tableView];
+    return height;
+}
 
 #pragma mark - ORKSurveyAnswerCellDelegate
 
@@ -978,54 +934,6 @@ static NSString *const _ORKOriginalAnswerRestoreKey = @"originalAnswer";
     [self answerDidChange];
 }
 
-#pragma mark - ORKTableContainerViewDelegate;
-
-- (nonnull UITableViewCell *)currentFirstResponderCellForTableContainerView:(nonnull ORKTableContainerView *)tableContainerView {
-    return _currentFirstResponderCell;
-}
-
-#pragma mark - ORKTextChoiceCellGroupDelegate
-
-- (void)answerChangedForIndexPath:(NSIndexPath *)indexPath {
-    // Capture `isStepImmediateNavigation` before saving an answer.
-    BOOL immediateNavigation = [self isStepImmediateNavigation];
-    
-    id answer = (self.questionStep.questionType == ORKQuestionTypeBoolean) ? [_choiceCellGroup answerForBoolean] :[_choiceCellGroup answer];
-    
-    [self saveAnswer:answer];
-    self.hasChangedAnswer = YES;
-    
-    if (immediateNavigation) {
-        // Proceed as continueButton tapped
-        dispatch_after(dispatch_time(DISPATCH_TIME_NOW, DelayBeforeAutoScroll * NSEC_PER_SEC), dispatch_get_main_queue(), ^{
-            ORKSuppressPerformSelectorWarning(
-                                              [self.continueButtonItem.target performSelector:self.continueButtonItem.action withObject:self.continueButtonItem];);
-        });
-    }
-}
-
-- (void)tableViewCellHeightUpdated {
-    [_tableView reloadData];
-}
-
-#pragma mark - ORKChoiceOtherViewCellDelegate
-
-- (void)textChoiceOtherCellDidBecomeFirstResponder:(ORKChoiceOtherViewCell *)choiceOtherViewCell {
-    _currentFirstResponderCell = choiceOtherViewCell;
-    NSIndexPath *indexPath = [_tableView indexPathForCell:choiceOtherViewCell];
-    if (indexPath) {
-        [_tableContainer scrollCellVisible:choiceOtherViewCell animated:YES];
-    }
-}
-
-- (void)textChoiceOtherCellDidResignFirstResponder:(ORKChoiceOtherViewCell *)choiceOtherViewCell {
-    if (_currentFirstResponderCell == choiceOtherViewCell) {
-        _currentFirstResponderCell = nil;
-    }
-    NSIndexPath *indexPath = [_tableView indexPathForCell:choiceOtherViewCell];
-    [_choiceCellGroup textViewDidResignResponderForCellAtIndexPath:indexPath];
-}
-
 //FIXME: Need Accessibility for Continue and skip button. Lost support when moved navigationFooterViewView outside VerticalContainerView.
 
 //    if (_navigationFooterView.continueButton != nil) {
@@ -1034,11 +942,5 @@ static NSString *const _ORKOriginalAnswerRestoreKey = @"originalAnswer";
 //    if (_navigationFooterView.skipButton != nil) {
 //        [elements addObject:self.continueSkipContainer.skipButton];
 //    }
-
-#pragma mark - ORKLearnViewDelegate
-
-- (void)learnMoreButtonPressedWithStep:(ORKLearnMoreInstructionStep *)learnMoreStep {
-    [self.taskViewController learnMoreButtonPressedWithStep:learnMoreStep fromStepViewController:self];
-}
 
 @end

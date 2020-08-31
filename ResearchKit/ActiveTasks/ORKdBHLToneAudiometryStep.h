@@ -50,17 +50,9 @@ ORK_CLASS_AVAILABLE
 
 @property (nonatomic, assign) double dBHLStepUpSize;
 
-@property (nonatomic, assign) double dBHLStepUpSizeFirstMiss;
-
-@property (nonatomic, assign) double dBHLStepUpSizeSecondMiss;
-
-@property (nonatomic, assign) double dBHLStepUpSizeThirdMiss;
-
 @property (nonatomic, assign) double dBHLStepDownSize;
 
-@property (nonatomic, assign) double dBHLMinimumThreshold;
-
-@property (nonatomic, strong) ORKHeadphoneTypeIdentifier headphoneType;
+@property (nonatomic, strong) NSString *headphoneType;
 
 @property (nonatomic, assign) ORKAudioChannel earPreference;
 

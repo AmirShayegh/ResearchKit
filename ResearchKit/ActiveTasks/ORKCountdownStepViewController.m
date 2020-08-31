@@ -36,6 +36,7 @@
 #import "ORKCustomStepView_Internal.h"
 #import "ORKLabel.h"
 #import "ORKSubheadlineLabel.h"
+#import "ORKVerticalContainerView.h"
 
 #import "ORKActiveStepViewController_Internal.h"
 #import "ORKStepViewController_Internal.h"

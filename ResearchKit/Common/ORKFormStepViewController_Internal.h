@@ -29,7 +29,7 @@
  */
 
 
-#import "ORKFormStepViewController_Private.h"
+#import "ORKFormStepViewController.h"
 
 
 NS_ASSUME_NONNULL_BEGIN

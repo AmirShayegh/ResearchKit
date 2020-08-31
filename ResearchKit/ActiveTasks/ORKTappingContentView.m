@@ -44,9 +44,6 @@
 
 // #define LAYOUT_DEBUG 1
 
-static const CGFloat ProgressViewTopPadding = 10.0;
-static const CGFloat TapCaptionLabelTopPadding = 20.0;
-static const CGFloat TapCountLabelTopPadding = 10.0;
 
 @interface ORKTappingContentView ()
 
@@ -112,6 +109,7 @@ static const CGFloat TapCountLabelTopPadding = 10.0;
         [self setTapCount:0];
         
         [self setUpConstraints];
+        [self updateConstraintConstantsForWindow:self.window];
         
         _tapCountLabel.accessibilityTraits |= UIAccessibilityTraitUpdatesFrequently;
         
@@ -165,6 +163,26 @@ static const CGFloat TapCountLabelTopPadding = 10.0;
     _tapButton2.enabled = NO;
 }
 
+- (void)willMoveToWindow:(UIWindow *)newWindow {
+    [super willMoveToWindow:newWindow];
+    [self updateConstraintConstantsForWindow:newWindow];
+}
+
+- (void)updateLayoutMargins {
+    CGFloat margin = ORKStandardHorizontalMarginForView(self);
+    self.layoutMargins = (UIEdgeInsets){.left = margin * 2, .right=margin * 2};
+}
+
+- (void)setFrame:(CGRect)frame {
+    [super setFrame:frame];
+    [self updateLayoutMargins];
+}
+
+- (void)setBounds:(CGRect)bounds {
+    [super setBounds:bounds];
+    [self updateLayoutMargins];
+}
+
 - (void)setUpConstraints {
     NSMutableArray *constraints = [NSMutableArray array];
     
@@ -175,34 +193,34 @@ static const CGFloat TapCountLabelTopPadding = 10.0;
                                                                    toItem:self
                                                                 attribute:NSLayoutAttributeTop
                                                                multiplier:1.0
-                                                                 constant:ProgressViewTopPadding];
+                                                                 constant:0.0]; // constant set in updateConstraintConstantsForWindow:
     [constraints addObject:_topToProgressViewConstraint];
     
     _topToCaptionLabelConstraint = [NSLayoutConstraint constraintWithItem:_tapCaptionLabel
                                                                 attribute:NSLayoutAttributeTop
                                                                 relatedBy:NSLayoutRelationEqual
-                                                                   toItem:_progressView
-                                                                attribute:NSLayoutAttributeBottom
+                                                                   toItem:self
+                                                                attribute:NSLayoutAttributeTop
                                                                multiplier:1.0
-                                                                 constant:TapCaptionLabelTopPadding];
+                                                                 constant:0.0]; // constant set in updateConstraintConstantsForWindow:
     [constraints addObject:_topToCaptionLabelConstraint];
     
     _captionLabelToTapCountLabelConstraint = [NSLayoutConstraint constraintWithItem:_tapCountLabel
-                                                                          attribute:NSLayoutAttributeTop
+                                                                          attribute:NSLayoutAttributeFirstBaseline
                                                                           relatedBy:NSLayoutRelationEqual
                                                                              toItem:_tapCaptionLabel
-                                                                          attribute:NSLayoutAttributeBottom
+                                                                          attribute:NSLayoutAttributeFirstBaseline
                                                                          multiplier:1.0
-                                                                           constant:TapCountLabelTopPadding];
+                                                                           constant:0.0]; // constant set in updateConstraintConstantsForWindow:
     [constraints addObject:_captionLabelToTapCountLabelConstraint];
     
-    _tapButtonToBottomConstraint = [NSLayoutConstraint constraintWithItem:_buttonContainer
+    _tapButtonToBottomConstraint = [NSLayoutConstraint constraintWithItem:self
                                                                 attribute:NSLayoutAttributeBottom
                                                                 relatedBy:NSLayoutRelationEqual
-                                                                   toItem:self
+                                                                   toItem:_buttonContainer
                                                                 attribute:NSLayoutAttributeBottom
                                                                multiplier:1.0
-                                                                 constant:0.0];
+                                                                 constant:0.0]; // constant set in updateConstraintConstantsForWindow:
     [constraints addObject:_tapButtonToBottomConstraint];
     
     [constraints addObjectsFromArray:
@@ -219,10 +237,10 @@ static const CGFloat TapCountLabelTopPadding = 10.0;
     NSLayoutConstraint *progressViewWidthConstraint = [NSLayoutConstraint constraintWithItem:_progressView
                                                                                    attribute:NSLayoutAttributeWidth
                                                                                    relatedBy:NSLayoutRelationEqual
-                                                                                      toItem:self
-                                                                                   attribute:NSLayoutAttributeWidth
-                                                                                  multiplier:0.8
-                                                                                    constant:0.0];
+                                                                                      toItem:nil
+                                                                                   attribute:NSLayoutAttributeNotAnAttribute
+                                                                                  multiplier:1.0
+                                                                                    constant:ORKScreenMetricMaxDimension];
     progressViewWidthConstraint.priority = UILayoutPriorityRequired - 1;
     [constraints addObject:progressViewWidthConstraint];
     
@@ -266,6 +284,39 @@ static const CGFloat TapCountLabelTopPadding = 10.0;
                                                          constant:0.0]];
     
     [NSLayoutConstraint activateConstraints:constraints];
+}
+
+- (void)updateConstraintConstantsForWindow:(UIWindow *)window {
+    const CGFloat HeaderBaselineToCaptionTop = ORKGetMetricForWindow(ORKScreenMetricCaptionBaselineToTappingLabelTop, window);
+    const CGFloat AssumedHeaderBaselineToStepViewTop = ORKGetMetricForWindow(ORKScreenMetricLearnMoreBaselineToStepViewTop, window);
+    CGFloat margin = ORKStandardHorizontalMarginForView(self);
+    self.layoutMargins = (UIEdgeInsets){.left = margin * 2, .right = margin * 2};
+    
+    static const CGFloat CaptionBaselineToTapCountBaseline = 56;
+    CGFloat tapButtonBottomToBottom = self.hasSkipButton ? 0 : 36;
+    
+    // On the iPhone, _progressView is positioned outside the bounds of this view, to be in-between the header and this view.
+    // On the iPad, we want to stretch this out a bit so it feels less compressed.
+    CGFloat topToProgressViewOffset = 0.0;
+    CGFloat topToCaptionLabelOffset = 0.0;
+    ORKScreenType screenType = ORKGetVerticalScreenTypeForWindow(window);
+    if (screenType == ORKScreenTypeiPad || screenType == ORKScreenTypeiPad10_5 || screenType == ORKScreenTypeiPad12_9) {
+        topToProgressViewOffset = 0;
+        topToCaptionLabelOffset = AssumedHeaderBaselineToStepViewTop;
+    } else {
+        topToProgressViewOffset = (HeaderBaselineToCaptionTop / 3) - AssumedHeaderBaselineToStepViewTop;
+        topToCaptionLabelOffset = HeaderBaselineToCaptionTop - AssumedHeaderBaselineToStepViewTop;
+    }
+    
+    _topToProgressViewConstraint.constant = topToProgressViewOffset;
+    _topToCaptionLabelConstraint.constant = topToCaptionLabelOffset;
+    _captionLabelToTapCountLabelConstraint.constant = CaptionBaselineToTapCountBaseline;
+    _tapButtonToBottomConstraint.constant = tapButtonBottomToBottom;
+}
+
+- (void)updateConstraints {
+    [self updateConstraintConstantsForWindow:self.window];
+    [super updateConstraints];
 }
 
 @end

@@ -85,7 +85,7 @@
     if (answer == ORKNullAnswerValue()) {
         answer = nil;
     }
-    NSParameterAssert(!answer || [answer isKindOfClass:[[self class] answerClass]] || [answer isKindOfClass:[ORKDontKnowAnswer class]]);
+    NSParameterAssert(!answer || [answer isKindOfClass:[[self class] answerClass]]);
     return answer;
 }
 
@@ -324,13 +324,13 @@
 - (instancetype)initWithCoordinate:(CLLocationCoordinate2D)coordinate
                             region:(CLCircularRegion *)region
                          userInput:(NSString *)userInput
-                     postalAddress:(CNPostalAddress *)postalAddress{
+                 addressDictionary:(NSDictionary *)addressDictionary {
     self = [super init];
     if (self) {
         _coordinate = coordinate;
         _region = [region copy];
         _userInput = [userInput copy];
-        _postalAddress = [postalAddress copy];
+        _addressDictionary = [addressDictionary copy];
     }
     return self;
 }
@@ -341,7 +341,7 @@
         _coordinate = placemark.location.coordinate;
         _userInput =  [userInput copy];
         _region = [placemark.region isKindOfClass:[CLCircularRegion class]] ? [placemark.region copy]  : nil;
-        _postalAddress = [placemark.postalAddress copy];
+        _addressDictionary = [placemark.addressDictionary copy];
     }
     return self;
 }
@@ -350,7 +350,7 @@
     return [[[self class] alloc] initWithCoordinate:self.coordinate
                                              region:self.region
                                           userInput:self.userInput
-                                      postalAddress:self.postalAddress];
+                                  addressDictionary:self.addressDictionary];
 }
 
 + (BOOL)supportsSecureCoding {
@@ -365,7 +365,7 @@ static NSString *const RegionIdentifierKey = @"region.identifier";
 - (void)encodeWithCoder:(NSCoder *)aCoder {
     ORK_ENCODE_OBJ(aCoder, userInput);
     ORK_ENCODE_COORDINATE(aCoder, coordinate);
-    ORK_ENCODE_OBJ(aCoder, postalAddress);
+    ORK_ENCODE_OBJ(aCoder, addressDictionary);
     
     [aCoder encodeObject:@(_region.center.latitude) forKey:RegionCenterLatitudeKey];
     [aCoder encodeObject:@(_region.center.longitude) forKey:RegionCenterLongitudeKey];
@@ -378,7 +378,7 @@ static NSString *const RegionIdentifierKey = @"region.identifier";
     if (self) {
         ORK_DECODE_OBJ_CLASS(aDecoder, userInput, NSString);
         ORK_DECODE_COORDINATE(aDecoder, coordinate);
-        ORK_DECODE_OBJ_CLASS(aDecoder, postalAddress, CNPostalAddress);
+        ORK_DECODE_OBJ_CLASS(aDecoder, addressDictionary, NSDictionary);
         ORK_DECODE_OBJ_CLASS(aDecoder, region, CLCircularRegion);
         
         NSNumber *latitude = [aDecoder decodeObjectOfClass:[NSNumber class] forKey:RegionCenterLatitudeKey];
@@ -395,7 +395,7 @@ static NSString *const RegionIdentifierKey = @"region.identifier";
 - (NSUInteger)hash {
     NSUInteger regionHash = (NSUInteger)(self.region.center.latitude * 1000) ^ (NSUInteger)(self.region.center.longitude * 1000) ^ (NSUInteger)(self.region.radius * 1000);
     NSUInteger coordinateHash = (NSUInteger)(self.coordinate.latitude * 1000) ^ (NSUInteger)(self.coordinate.longitude * 1000);
-    return coordinateHash ^ regionHash ^ self.userInput.hash ^ self.postalAddress.hash;
+    return coordinateHash ^ regionHash ^ self.userInput.hash ^ self.addressDictionary.hash;
 }
 
 - (BOOL)isEqual:(id)object {
@@ -405,7 +405,7 @@ static NSString *const RegionIdentifierKey = @"region.identifier";
     
     __typeof(self) castObject = object;
     return (ORKEqualObjects(self.userInput, castObject.userInput) &&
-            ORKEqualObjects(self.postalAddress, castObject.postalAddress)&&
+            ORKEqualObjects(self.addressDictionary, castObject.addressDictionary) &&
             // The region is not checking for equality properly so check the values
             (self.region.center.latitude == castObject.region.center.latitude) &&
             (self.region.center.longitude == castObject.region.center.longitude) &&
@@ -414,7 +414,7 @@ static NSString *const RegionIdentifierKey = @"region.identifier";
 }
 
 - (NSString *)description {
-    return [NSString stringWithFormat:@"%@ region:%@ userInput:%@ postalAddress:%@>", [super description], self.region, self.userInput, self.postalAddress];
+    return [NSString stringWithFormat:@"%@ region:%@ userInput:%@ addressDictionary:%@>", [super description], self.region, self.userInput, self.addressDictionary];
 }
 
 @end
@@ -463,55 +463,6 @@ static NSString *const RegionIdentifierKey = @"region.identifier";
 
 - (id)answer {
     return self.locationAnswer;
-}
-
-@end
-
-#pragma mark ORKSESQuestionResult
-
-@implementation ORKSESQuestionResult
-
-- (void)setAnswer:(id)answer {
-    answer = [self validateAnswer:answer];
-    self.rungPicked = [answer copy];
-}
-
-+ (Class)answerClass {
-    return [NSNumber class];
-}
-
-- (id)answer {
-    return self.rungPicked;
-}
-
-- (void)encodeWithCoder:(NSCoder *)aCoder {
-    [super encodeWithCoder:aCoder];
-    ORK_ENCODE_OBJ(aCoder, rungPicked);
-}
-
-- (instancetype)initWithCoder:(NSCoder *)aDecoder {
-    self = [super initWithCoder:aDecoder];
-    if (self) {
-        ORK_DECODE_OBJ_CLASS(aDecoder, rungPicked, NSNumber);
-    }
-    return self;
-}
-
-+ (BOOL)supportsSecureCoding {
-    return YES;
-}
-
-- (BOOL)isEqual:(id)object {
-    BOOL isParentSame = [super isEqual:object];
-
-    __typeof(self) castObject = object;
-    return (isParentSame && ORKEqualObjects(self.rungPicked, castObject.rungPicked));
-}
-
-- (instancetype)copyWithZone:(NSZone *)zone {
-    ORKSESQuestionResult *result = [super copyWithZone:zone];
-    result->_rungPicked = [self.rungPicked copy];
-    return result;
 }
 
 @end
@@ -627,7 +578,7 @@ static NSString *const RegionIdentifierKey = @"region.identifier";
     if (answer == ORKNullAnswerValue()) {
         answer = nil;
     }
-    NSAssert(!answer || [answer isKindOfClass:[[self class] answerClass]] || [answer isKindOfClass:[ORKDontKnowAnswer class]], @"Answer should be of class %@", NSStringFromClass([[self class] answerClass]));
+    NSAssert(!answer || [answer isKindOfClass:[[self class] answerClass]], @"Answer should be of class %@", NSStringFromClass([[self class] answerClass]));
     self.numericAnswer = answer;
 }
 

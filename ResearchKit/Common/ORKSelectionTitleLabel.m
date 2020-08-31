@@ -37,7 +37,10 @@
 @implementation ORKSelectionTitleLabel
 
 + (UIFont *)defaultFont {
-    return [UIFont preferredFontForTextStyle:UIFontTextStyleBody];
+    // medium, 17. Increased by 1 due review feedback.
+    UIFontDescriptor *descriptor = [UIFontDescriptor preferredFontDescriptorWithTextStyle:UIFontTextStyleHeadline];
+    const CGFloat defaultSize = 17;
+    return ORKMediumFontWithSize([[descriptor objectForKey: UIFontDescriptorSizeAttribute] doubleValue] + 18 - defaultSize);
 }
 
 @end

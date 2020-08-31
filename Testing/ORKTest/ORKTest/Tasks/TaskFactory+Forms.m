@@ -58,11 +58,6 @@
         answerFormat.autocapitalizationType = UITextAutocapitalizationTypeNone;
         answerFormat.autocorrectionType = UITextAutocorrectionTypeNo;
         answerFormat.spellCheckingType = UITextSpellCheckingTypeNo;
-        if (@available(iOS 12.0, *)) {
-            answerFormat.textContentType = UITextContentTypeNewPassword;
-        } else {
-            answerFormat.textContentType = UITextContentTypePassword;
-        }
         
         ORKFormItem *item = [[ORKFormItem alloc] initWithIdentifier:@"password"
                                                                text:@"Password"
@@ -279,7 +274,6 @@
             format.autocapitalizationType = UITextAutocapitalizationTypeNone;
             format.autocorrectionType = UITextAutocorrectionTypeNo;
             format.spellCheckingType = UITextSpellCheckingTypeNo;
-            format.textContentType = UITextContentTypeURL;
             
             ORKFormItem *item = [[ORKFormItem alloc] initWithIdentifier:@"url" text:@"URL"
                                                            answerFormat:format];
@@ -536,7 +530,6 @@
             ORKTextScaleAnswerFormat *scaleAnswerFormat = [ORKAnswerFormat textScaleAnswerFormatWithTextChoices:textChoices
                                                                                                    defaultIndex:NSIntegerMax
                                                                                                        vertical:NO];
-            scaleAnswerFormat.hideSelectedValue = YES;
             
             ORKFormItem *item = [[ORKFormItem alloc] initWithIdentifier:@"scale7"
                                                                    text:@"How are you feeling today?"
@@ -556,7 +549,6 @@
             ORKTextScaleAnswerFormat *scaleAnswerFormat = [ORKAnswerFormat textScaleAnswerFormatWithTextChoices:textChoices
                                                                                                    defaultIndex:NSIntegerMax
                                                                                                        vertical:YES];
-            scaleAnswerFormat.hideSelectedValue = YES;
             
             ORKFormItem *item = [[ORKFormItem alloc] initWithIdentifier:@"scale8"
                                                                    text:@"How are you feeling today?"

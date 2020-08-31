@@ -318,7 +318,7 @@
                                                                          toItem:nil
                                                                       attribute:NSLayoutAttributeNotAnAttribute
                                                                      multiplier:1.0
-                                                                       constant:CGFLOAT_MIN];
+                                                                       constant:ORKScreenMetricMaxDimension];
     gameViewHeightConstraint.priority = UILayoutPriorityDefaultLow - 1;
     [constraints addObject:gameViewHeightConstraint];
     

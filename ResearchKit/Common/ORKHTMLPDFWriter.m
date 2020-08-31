@@ -31,9 +31,10 @@
 
 #import "ORKHTMLPDFWriter.h"
 #import "ORKHTMLPDFPageRenderer.h"
-#import <WebKit/WebKit.h>
 
 #import "ORKHelpers_Internal.h"
+#import <WebKit/WebKit.h>
+#import "WKWebView+ResearchKit.h"
 
 
 #define ORKPPI 72
@@ -76,10 +77,8 @@ static const CGFloat PageEdge = 72.0 / 4;
     _data = nil;
     _error = nil;
     
-    WKWebViewConfiguration *webViewConfiguration = [WKWebViewConfiguration new];
-    WKWebView *webView = [[WKWebView alloc] initWithFrame:CGRectZero configuration:webViewConfiguration];
-    webView.navigationDelegate = self;
-    self.webView = webView;
+    self.webView = [WKWebView createResearchKitWebViewWith:CGRectZero];
+    self.webView.navigationDelegate = self;
     [self.webView loadHTMLString:html baseURL:ORKCreateRandomBaseURL()];
     
     _selfRetain = self;
@@ -147,18 +146,19 @@ static const CGFloat PageEdge = 72.0 / 4;
 #pragma mark - WKNavigationDelegate
 
 - (void)webView:(WKWebView *)webView didFinishNavigation:(WKNavigation *)navigation {
-    [webView evaluateJavaScript:@"document.readyState" completionHandler:^(id _Nullable result, NSError * _Nullable error) {
-        NSString *readyState = [result isKindOfClass:NSString.class] ? result : [NSString new];
-        BOOL complete = [readyState isEqualToString:@"complete"];
+    __weak ORKHTMLPDFWriter *weakSelf = self;
+    [webView evaluateJavaScript:@"document.readyState" completionHandler:^(id _Nullable value, NSError * _Nullable error) {
+        BOOL complete = [[value description] isEqualToString:@"complete"];
         
-        [[self class] cancelPreviousPerformRequestsWithTarget:self selector:@selector(timeout) object:nil];
+        [[weakSelf class] cancelPreviousPerformRequestsWithTarget:self selector:@selector(timeout) object:nil];
         
         if (complete) {
-            [self savePDF];
+            [weakSelf savePDF];
         } else {
-            [self performSelector:@selector(timeout) withObject:nil afterDelay:1.0f];
+            [weakSelf performSelector:@selector(timeout) withObject:nil afterDelay:1.0f];
         }
     }];
+    
 }
 
 - (void)webView:(WKWebView *)webView didFailNavigation:(WKNavigation *)navigation withError:(NSError *)error {

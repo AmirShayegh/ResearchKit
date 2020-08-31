@@ -31,7 +31,6 @@
 
 @import UIKit;
 #import <ResearchKit/ORKDefines.h>
-#import "ORKTask.h"
 
 
 NS_ASSUME_NONNULL_BEGIN
@@ -156,20 +155,6 @@ typedef NS_ENUM(NSInteger, ORKStepViewControllerNavigationDirection) {
  */
 - (BOOL)stepViewControllerHasNextStep:(ORKStepViewController *)stepViewController;
 
-/**
- Asks the delegate for the total amount of questions for the entire task and the position of the current step.
- 
- Depending on the result of the step, the step view controller can adjust the language for the
- Next button.
- 
- @param stepViewController     The step view controller providing the callback.
- 
- @param currentStep     The current step that is being presented.
- 
- @return a struct 
- */
-- (ORKTaskTotalProgress)stepViewControllerTotalProgressInfoForStep:(ORKStepViewController *)stepViewController currentStep:(ORKStep *)currentStep;
-
 @end
 
 
@@ -205,7 +190,7 @@ ORK_CLASS_AVAILABLE
  
  @return A newly initialized step view controller.
  */
-- (instancetype)initWithStep:(nullable ORKStep *)step NS_DESIGNATED_INITIALIZER;
+- (instancetype)initWithStep:(nullable ORKStep *)step;
 
 /**
  Returns a new step view controller for the specified step.
@@ -215,7 +200,7 @@ ORK_CLASS_AVAILABLE
  
  @return A newly initialized step view controller.
  */
-- (instancetype)initWithStep:(ORKStep *)step result:(nullable ORKResult *)result;
+- (instancetype)initWithStep:(ORKStep *)step result:(ORKResult *)result;
 
 /**
  The step presented by the step view controller.
@@ -246,7 +231,7 @@ ORK_CLASS_AVAILABLE
  A localized string that represents the title of the Continue button.
  
  Most steps display a button that enables forward navigation. This button can have titles
- such as Next, Continue, or Done. Use this property to override the forward navigationORKTableSection
+ such as Next, Continue, or Done. Use this property to override the forward navigation
  button title for the step.
  */
 @property (nonatomic, copy, nullable) NSString *continueButtonTitle;
@@ -277,7 +262,9 @@ ORK_CLASS_AVAILABLE
  This property lets you control the appearance and target of the
  Back button at runtime.
  
- When the value of the property is `nil`, the default Back button is displayed; otherwise passed Back button item is used . If you want to hide the back button, set it to a newly allocated `UIBarButtonItem` instance.
+ When the value of the property is `nil`, the Back button is not displayed; otherwise, the title, target,
+ and action associated with the Back button item are used (other properties of `UIBarButtonItem`
+ are ignored).
  
  The back button item is updated during view loading and when the value of the `step` property
  is changed, but they are safe to set in the `taskViewController:stepViewControllerWillAppear:` delegate callback.
@@ -327,11 +314,6 @@ ORK_CLASS_AVAILABLE
  actually necessary.
  */
 @property (nonatomic, copy, readonly, nullable) ORKStepResult *result;
-
-/**
- A boolean indicating if the step was skipped or not.
- */
-@property (nonatomic, assign, readonly) BOOL wasSkipped;
 
 /**
  Add a result to the step view controller's `ORKStepResult`. By default, the property for
@@ -395,14 +377,6 @@ ORK_CLASS_AVAILABLE
  This method is called when the user taps the skip button. By default, it calls `-goForward`.
  */
 - (void)skipForward;
-
-/**
- Control the activity indicator on the Continue buttom.
- 
- @param showActivityIndicator     Set this value to `true` to show an animating activity indicator to the left of the
-    Continue button. Set this value to `false` to hide the activity indicator.
-*/
-- (void)showActivityIndicatorInContinueButton:(BOOL)showActivityIndicator;
 
 /**
  A Boolean value indicating whether the view controller has been presented before.

@@ -78,7 +78,6 @@
     step.filterFileNameWithExtension = self.filterFileNameWithExtension;
     step.gainAppliedToNoise = self.gainAppliedToNoise;
     step.willAudioLoop = self.willAudioLoop;
-    step.hideGraphView = self.hideGraphView;
     return step;
 }
 
@@ -90,7 +89,6 @@
         ORK_DECODE_OBJ(aDecoder, filterFileNameWithExtension);
         ORK_DECODE_DOUBLE(aDecoder, gainAppliedToNoise);
         ORK_DECODE_BOOL(aDecoder, willAudioLoop);
-        ORK_DECODE_BOOL(aDecoder, hideGraphView);
     }
     return self;
 }
@@ -102,7 +100,6 @@
     ORK_ENCODE_OBJ(aCoder, filterFileNameWithExtension);
     ORK_ENCODE_DOUBLE(aCoder, gainAppliedToNoise);
     ORK_ENCODE_BOOL(aCoder, willAudioLoop);
-    ORK_ENCODE_BOOL(aCoder, hideGraphView);
 }
 
 + (BOOL)supportsSecureCoding {
@@ -118,8 +115,7 @@
             && ORKEqualObjects(self.noiseFileNameWithExtension, castObject.noiseFileNameWithExtension)
             && ORKEqualObjects(self.filterFileNameWithExtension, castObject.filterFileNameWithExtension)
             && (self.gainAppliedToNoise == castObject.gainAppliedToNoise)
-            && (self.willAudioLoop == castObject.willAudioLoop)
-            && (self.hideGraphView == castObject.hideGraphView));
+            && (self.willAudioLoop == castObject.willAudioLoop));
 }
 
 @end

@@ -39,6 +39,8 @@
 #import "ORKHelpers_Internal.h"
 #import "ORKSkin.h"
 
+#import "WKWebView+ResearchKit.h"
+
 
 static const CGFloat iPadStepTitleLabelFontSize = 50.0;
 @interface ORKConsentReviewController () <WKNavigationDelegate, UIScrollViewDelegate>
@@ -81,15 +83,15 @@ static const CGFloat iPadStepTitleLabelFontSize = 50.0;
     
     _toolbar = [[UIToolbar alloc] init];
     
-    _toolbar.items = self.toolbarItems;
+    _toolbar.items = [@[_cancelButtonItem,
+                       [[UIBarButtonItem alloc] initWithBarButtonSystemItem:UIBarButtonSystemItemFlexibleSpace target:nil action:nil]] arrayByAddingObjectsFromArray:self.toolbarItems];
     
     self.view.backgroundColor = ORKColor(ORKConsentBackgroundColorKey);
     if (self.navigationController.navigationBar) {
-        [self.navigationController.navigationBar setBarTintColor: [UIColor colorWithRed:0.00 green:0.42 blue:0.91 alpha:1.0]];
+        [self.navigationController.navigationBar setBarTintColor:[UIColor colorWithRed:0.00 green:0.42 blue:0.91 alpha:1.0]];
     }
     
-    WKWebViewConfiguration *webViewConfiguration = [WKWebViewConfiguration new];
-    _webView = [[WKWebView alloc] initWithFrame:CGRectZero configuration:webViewConfiguration];
+    _webView = [WKWebView createResearchKitWebViewWith:self.view.frame];
     [_webView loadHTMLString:_htmlString baseURL:ORKCreateRandomBaseURL()];
     _webView.backgroundColor = ORKColor(ORKConsentBackgroundColorKey);
     _webView.scrollView.backgroundColor = ORKColor(ORKConsentBackgroundColorKey);
@@ -142,7 +144,6 @@ static const CGFloat iPadStepTitleLabelFontSize = 50.0;
     [self updateLayoutMargins];
 }
 
-
 - (void)setUpStaticConstraints {
     NSMutableArray *constraints = [NSMutableArray new];
     
@@ -167,22 +168,6 @@ static const CGFloat iPadStepTitleLabelFontSize = 50.0;
     [NSLayoutConstraint activateConstraints:constraints];
 }
 
-- (IBAction)cancelWithConfirmation {
-    UIAlertController *alert = [UIAlertController alertControllerWithTitle:ORKLocalizedString(@"CONSENT_REVIEW_CONFIRM_DISAGREE_ALERT_TITLE", nil)
-                                                                   message:ORKLocalizedString(@"CONSENT_REVIEW_CONFIRM_DISAGREE_ALERT_MESSAGE", nil)
-                                                            preferredStyle:UIAlertControllerStyleAlert];
-
-    [alert addAction:[UIAlertAction actionWithTitle:ORKLocalizedString(@"BUTTON_CANCEL", nil) style:UIAlertActionStyleDefault handler:nil]];
-    [alert addAction:[UIAlertAction actionWithTitle:ORKLocalizedString(@"BUTTON_OK", nil) style:UIAlertActionStyleDefault handler:^(UIAlertAction *action) {
-        // Have to dispatch, so following transition animation works
-        dispatch_async(dispatch_get_main_queue(), ^{
-            [self cancel];
-        });
-    }]];
-
-    [self presentViewController:alert animated:YES completion:nil];
-}
-
 - (void)updateViewConstraints {
     [super updateViewConstraints];
     if (!_variableConstraints) {
@@ -202,6 +187,22 @@ static const CGFloat iPadStepTitleLabelFontSize = 50.0;
                                                                                       metrics:@{ @"horizMargin": @(horizontalMargin) }
                                                                                         views:views]];
     [NSLayoutConstraint activateConstraints:_variableConstraints];
+}
+
+- (IBAction)cancelWithConfirmation {
+    UIAlertController *alert = [UIAlertController alertControllerWithTitle:ORKLocalizedString(@"CONSENT_REVIEW_CONFIRM_DISAGREE_ALERT_TITLE", nil)
+                                                                   message:ORKLocalizedString(@"CONSENT_REVIEW_CONFIRM_DISAGREE_ALERT_MESSAGE", nil)
+                                                            preferredStyle:UIAlertControllerStyleAlert];
+
+    [alert addAction:[UIAlertAction actionWithTitle:ORKLocalizedString(@"BUTTON_CANCEL", nil) style:UIAlertActionStyleDefault handler:nil]];
+    [alert addAction:[UIAlertAction actionWithTitle:ORKLocalizedString(@"BUTTON_OK", nil) style:UIAlertActionStyleDefault handler:^(UIAlertAction *action) {
+        // Have to dispatch, so following transition animation works
+        dispatch_async(dispatch_get_main_queue(), ^{
+            [self cancel];
+        });
+    }]];
+
+    [self presentViewController:alert animated:YES completion:nil];
 }
 
 - (IBAction)cancel {
@@ -232,17 +233,15 @@ static const CGFloat iPadStepTitleLabelFontSize = 50.0;
     [self presentViewController:alert animated:YES completion:nil];
 }
 
-- (void)webView:(WKWebView *) __unused webView decidePolicyForNavigationAction:(WKNavigationAction *)navigationAction decisionHandler:(void (^)(WKNavigationActionPolicy))decisionHandler {
+- (void)webView:(WKWebView *)webView decidePolicyForNavigationAction:(WKNavigationAction *)navigationAction decisionHandler:(void (^)(WKNavigationActionPolicy))decisionHandler {
     if (navigationAction.navigationType != WKNavigationTypeOther) {
-        [[UIApplication sharedApplication] openURL:navigationAction.request.URL options:@{} completionHandler:^(BOOL __unused success) {
-            decisionHandler(WKNavigationActionPolicyCancel);
-        }];
-    } else {
-        decisionHandler(WKNavigationActionPolicyAllow);
+        [[UIApplication sharedApplication] openURL:webView.URL options:@{} completionHandler:nil];
+        decisionHandler(WKNavigationActionPolicyCancel);
     }
+    decisionHandler(WKNavigationActionPolicyAllow);
 }
 
-- (void)webView:(WKWebView *)webView didFinishNavigation:(WKNavigation *) __unused navigation {
+- (void)webView:(WKWebView *)webView didFinishNavigation:(WKNavigation *)navigation {
     //need a delay here because of a race condition where the webview may not have fully rendered by the time this is called in which case scrolledToBottom returns YES because everything == 0
     dispatch_after(dispatch_time(DISPATCH_TIME_NOW, (int64_t)(0.1 * NSEC_PER_SEC)), dispatch_get_main_queue(), ^{
         if (!_agreeButton.isEnabled && [self scrolledToBottom:_webView.scrollView]) {
@@ -252,11 +251,9 @@ static const CGFloat iPadStepTitleLabelFontSize = 50.0;
 }
 
 - (void)scrollViewDidScroll:(UIScrollView *)scrollView {
-    dispatch_after(dispatch_time(DISPATCH_TIME_NOW, (int64_t)(0.1 * NSEC_PER_SEC)), dispatch_get_main_queue(), ^{
-        if (!_agreeButton.isEnabled && [self scrolledToBottom:scrollView]) {
-            _agreeButton.enabled = YES;
-        }
-    });
+    if (!_agreeButton.isEnabled && [self scrolledToBottom:scrollView]) {
+        _agreeButton.enabled = YES;
+    }
 }
 
 - (BOOL)scrolledToBottom:(UIScrollView *)scrollView {

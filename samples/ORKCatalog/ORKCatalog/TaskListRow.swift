@@ -38,32 +38,32 @@ import AudioToolbox
     types of functionality supported by the ResearchKit framework.
 */
 enum TaskListRow: Int, Printable {
-    case scaleQuestion = 0
-    case numericQuestion
-    case timeOfDayQuestion
-    case dateQuestion
-    case dateTimeQuestion
-    case timeIntervalQuestion
-    case textQuestion
-    case valuePickerChoiceQuestion
-    case textChoiceQuestion
-    case imageChoiceQuestion
-    case booleanQuestion
-    case twoFingerTappingInterval
-    case spatialSpanMemory
-    case fitness
-    case shortWalk
-    case audio
-    case toneAudiometry
-    case reactionTime
-    case towerOfHanoi
-    case psat
-    case timedWalk
-    case holePegTest
-    case imageCapture
-    case survey
-    case consent
-    case form
+    case ScaleQuestion = 0
+    case NumericQuestion
+    case TimeOfDayQuestion
+    case DateQuestion
+    case DateTimeQuestion
+    case TimeIntervalQuestion
+    case TextQuestion
+    case ValuePickerChoiceQuestion
+    case TextChoiceQuestion
+    case ImageChoiceQuestion
+    case BooleanQuestion
+    case TwoFingerTappingInterval
+    case SpatialSpanMemory
+    case Fitness
+    case ShortWalk
+    case Audio
+    case ToneAudiometry
+    case ReactionTime
+    case TowerOfHanoi
+    case PSAT
+    case TimedWalk
+    case HolePegTest
+    case ImageCapture
+    case Survey
+    case Consent
+    case Form
     
     /// Returns an array of all the task list row enum cases.
     static var allCases: [TaskListRow] {
@@ -182,89 +182,89 @@ enum TaskListRow: Int, Printable {
     */
     private enum Identifier: String {
         // Task with examples of questions with sliding scales.
-        case scaleQuestionTask =                                    "ScaleQuestionTask"
-        case discreteScaleQuestionStep =                            "DiscreteScaleQuestionStep"
-        case continuousScaleQuestionStep =                          "ContinuousScaleQuestionStep"
-        case discreteVerticalScaleQuestionStep =                    "DiscreteVerticalScaleQuestionStep"
-        case continuousVerticalScaleQuestionStep =                  "ContinuousVerticalScaleQuestionStep"
+        case ScaleQuestionTask =                                    "ScaleQuestionTask"
+        case DiscreteScaleQuestionStep =                            "DiscreteScaleQuestionStep"
+        case ContinuousScaleQuestionStep =                          "ContinuousScaleQuestionStep"
+        case DiscreteVerticalScaleQuestionStep =                    "DiscreteVerticalScaleQuestionStep"
+        case ContinuousVerticalScaleQuestionStep =                  "ContinuousVerticalScaleQuestionStep"
 
         // Task with examples of numeric questions.
-        case numericQuestionTask =                                  "NumericQuestionTask"
-        case numericQuestionStep =                                  "NumericQuestionStep"
-        case numericNoUnitQuestionStep =                            "NumericNoUnitQuestionStep"
+        case NumericQuestionTask =                                  "NumericQuestionTask"
+        case NumericQuestionStep =                                  "NumericQuestionStep"
+        case NumericNoUnitQuestionStep =                            "NumericNoUnitQuestionStep"
         
         // Task with an example of time of day entry.
-        case timeOfDayQuestionTask =                                "TimeOfDayQuestionTask"
-        case timeOfDayQuestionStep =                                "TimeOfDayQuestionStep"
+        case TimeOfDayQuestionTask =                                "TimeOfDayQuestionTask"
+        case TimeOfDayQuestionStep =                                "TimeOfDayQuestionStep"
 
         // Task with an example of date entry.
-        case dateQuestionTask =                                     "DateQuestionTask"
-        case dateQuestionStep =                                     "DateQuestionStep"
+        case DateQuestionTask =                                     "DateQuestionTask"
+        case DateQuestionStep =                                     "DateQuestionStep"
 
         // Task with an example of date and time entry.
-        case dateTimeQuestionTask =                                 "DateTimeQuestionTask"
-        case dateTimeQuestionStep =                                 "DateTimeQuestionStep"
+        case DateTimeQuestionTask =                                 "DateTimeQuestionTask"
+        case DateTimeQuestionStep =                                 "DateTimeQuestionStep"
 
         // Task with an example of time interval entry.
-        case timeIntervalQuestionTask =                             "TimeIntervalQuestionTask"
-        case timeIntervalQuestionStep =                             "TimeIntervalQuestionStep"
+        case TimeIntervalQuestionTask =                             "TimeIntervalQuestionTask"
+        case TimeIntervalQuestionStep =                             "TimeIntervalQuestionStep"
 
         // Task with an example of free text entry.
-        case textQuestionTask =                                     "TextQuestionTask"
-        case textQuestionStep =                                     "TextQuestionStep"
+        case TextQuestionTask =                                     "TextQuestionTask"
+        case TextQuestionStep =                                     "TextQuestionStep"
 
         // Task with a value picker.
-        case valuePickerChoiceQuestionTask =                        "ValuePickerChoiceQuestionTask"
-        case valuePickerChoiceQuestionStep =                        "ValuePickerChoiceQuestionStep"
+        case ValuePickerChoiceQuestionTask =                        "ValuePickerChoiceQuestionTask"
+        case ValuePickerChoiceQuestionStep =                        "ValuePickerChoiceQuestionStep"
         
         // Task with an example of a multiple choice question.
-        case textChoiceQuestionTask =                               "TextChoiceQuestionTask"
-        case textChoiceQuestionStep =                               "TextChoiceQuestionStep"
+        case TextChoiceQuestionTask =                               "TextChoiceQuestionTask"
+        case TextChoiceQuestionStep =                               "TextChoiceQuestionStep"
         
         // Task with an image choice question.
-        case imageChoiceQuestionTask =                              "ImageChoiceQuestionTask"
-        case imageChoiceQuestionStep =                              "ImageChoiceQuestionStep"
+        case ImageChoiceQuestionTask =                              "ImageChoiceQuestionTask"
+        case ImageChoiceQuestionStep =                              "ImageChoiceQuestionStep"
 
         // Survey example with a Boolean question.
-        case booleanQuestionTask =                                  "BooleanQuestionTask"
-        case booleanQuestionStep =                                  "BooleanQuestionStep"
+        case BooleanQuestionTask =                                  "BooleanQuestionTask"
+        case BooleanQuestionStep =                                  "BooleanQuestionStep"
 
         // Active tasks.
-        case twoFingerTappingIntervalTask =                         "TwoFingerTappingIntervalTask"
-        case spatialSpanMemoryTask =                                "SpatialSpanMemoryTask"
-        case fitnessTask =                                          "FitnessTask"
-        case shortWalkTask =                                        "ShortWalkTask"
-        case audioTask =                                            "AudioTask"
-        case toneAudiometryTask =                                   "ToneAudiometry"
-        case reactionTime =                                         "ReactionTime"
-        case towerOfHanoi =                                         "TowerOfHanoi"
-        case psatTask =                                             "PSATTask"
-        case timedWalkTask =                                        "TimedWalkTask"
-        case holePegTestTask =                                      "HolePegTestTask"
+        case TwoFingerTappingIntervalTask =                         "TwoFingerTappingIntervalTask"
+        case SpatialSpanMemoryTask =                                "SpatialSpanMemoryTask"
+        case FitnessTask =                                          "FitnessTask"
+        case ShortWalkTask =                                        "ShortWalkTask"
+        case AudioTask =                                            "AudioTask"
+        case ToneAudiometryTask =                                   "ToneAudiometry"
+        case ReactionTime =                                         "ReactionTime"
+        case TowerOfHanoi =                                         "TowerOfHanoi"
+        case PSATTask =                                             "PSATTask"
+        case TimedWalkTask =                                        "TimedWalkTask"
+        case HolePegTestTask =                                      "HolePegTestTask"
         
         // Image capture task specific identifiers.
-        case imageCaptureTask =                                    "ImageCaptureTask"
-        case imageCaptureStep =                                    "ImageCaptureStep"
+        case ImageCaptureTask =                                    "ImageCaptureTask"
+        case ImageCaptureStep =                                    "ImageCaptureStep"
 
         // Survey task specific identifiers.
-        case surveyTask =                                           "SurveyTask"
-        case introStep =                                            "IntroStep"
-        case questionStep =                                         "QuestionStep"
-        case summaryStep =                                          "SummaryStep"
+        case SurveyTask =                                           "SurveyTask"
+        case IntroStep =                                            "IntroStep"
+        case QuestionStep =                                         "QuestionStep"
+        case SummaryStep =                                          "SummaryStep"
         
         // Consent task specific identifiers.
-        case consentTask =                                          "ConsentTask"
-        case visualConsentStep =                                    "VisualConsentStep"
-        case consentSharingStep =                                   "ConsentSharingStep"
-        case consentReviewStep =                                    "ConsentReviewStep"
-        case consentDocumentParticipantSignature =                  "ConsentDocumentParticipantSignature"
-        case consentDocumentInvestigatorSignature =                 "ConsentDocumentInvestigatorSignature"
+        case ConsentTask =                                          "ConsentTask"
+        case VisualConsentStep =                                    "VisualConsentStep"
+        case ConsentSharingStep =                                   "ConsentSharingStep"
+        case ConsentReviewStep =                                    "ConsentReviewStep"
+        case ConsentDocumentParticipantSignature =                  "ConsentDocumentParticipantSignature"
+        case ConsentDocumentInvestigatorSignature =                 "ConsentDocumentInvestigatorSignature"
 
         // Task with a form, where multiple items appear on one page.
-        case formTask =                                             "FormTask"
-        case formStep =                                             "FormStep"
-        case formItem01 =                                           "FormItem01"
-        case formItem02 =                                           "FormItem02"
+        case FormTask =                                             "FormTask"
+        case FormStep =                                             "FormStep"
+        case FormItem01 =                                           "FormItem01"
+        case FormItem02 =                                           "FormItem02"
     }
     
     // MARK: Properties
@@ -481,7 +481,7 @@ enum TaskListRow: Int, Printable {
         commute?"
     */
     private var timeIntervalQuestionTask: ORKTask {
-        /*
+        /* 
             The time interval answer format is constrained to entering a time
             less than 24 hours and in steps of minutes. For times that don't fit
             these restrictions, use another mode of data entry.
@@ -564,7 +564,7 @@ enum TaskListRow: Int, Printable {
     }
 
     /**
-        This task demonstrates a survey question involving picking from a series of
+        This task demonstrates a survey question involving picking from a series of 
         image choices. A more realistic applciation of this type of question might be to
         use a range of icons for faces ranging from happy to sad.
     */
@@ -763,7 +763,7 @@ enum TaskListRow: Int, Printable {
             This effectively tells the consent review step which signatory is
             reviewing the document.
         */
-        let signature = consentDocument.signatures!.first as? ORKConsentSignature
+        let signature = consentDocument.signatures!.first as! ORKConsentSignature
 
         let reviewConsentStep = ORKConsentReviewStep(identifier: Identifier.ConsentReviewStep.rawValue, signature: signature, inDocument: consentDocument)
 
@@ -819,7 +819,7 @@ enum TaskListRow: Int, Printable {
         // This is the title of the signature page in the generated document.
         consentDocument.signaturePageTitle = NSLocalizedString("Consent", comment: "")
         
-        /*
+        /* 
             This is the line shown on the signature page of the generated document,
             just above the signatures.
         */
@@ -854,7 +854,7 @@ enum TaskListRow: Int, Printable {
         
         consentDocument.addSignature(investigatorSignature)
         
-        /*
+        /* 
             This is the HTML content for the "Learn More" page for each consent
             section. In a real consent, this would be your content, and you would
             have different content for each section.
@@ -893,7 +893,8 @@ enum TaskListRow: Int, Printable {
             
             if contentSectionType == .Overview {
                 consentSection.htmlContent = htmlContentString
-            } else {
+            }
+            else {
                 consentSection.content = self.loremIpsumLongText
             }
             

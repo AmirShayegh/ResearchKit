@@ -30,7 +30,6 @@
 
 
 #import "ORKQuestionStep.h"
-#import "ORKLearnMoreItem.h"
 
 #import "ORKQuestionStepViewController.h"
 
@@ -55,22 +54,6 @@
     step.title = title;
     step.question = question;
     step.answerFormat = answerFormat;
-    step.tagText = nil;
-    return step;
-}
-
-+ (instancetype)questionStepWithIdentifier:(NSString *)identifier
-                                     title:(nullable NSString *)title
-                                  question:(nullable NSString *)question
-                                    answer:(nullable ORKAnswerFormat *)answerFormat
-                             learnMoreItem:(nullable ORKLearnMoreItem *)learnMoreItem {
-    
-    ORKQuestionStep *step = [[ORKQuestionStep alloc] initWithIdentifier:identifier];
-    step.title = title;
-    step.question = question;
-    step.answerFormat = answerFormat;
-    step.learnMoreItem = learnMoreItem;
-    step.tagText = nil;
     return step;
 }
 
@@ -81,8 +64,6 @@
         self.optional = YES;
         self.useSurveyMode = YES;
         self.useCardView = YES;
-        self.showsProgress = YES;
-        self.tagText = nil;
     }
     return self;
 }
@@ -103,9 +84,6 @@
     ORKQuestionStep *questionStep = [super copyWithZone:zone];
     questionStep.answerFormat = [self.answerFormat copy];
     questionStep.placeholder = [self.placeholder copy];
-    questionStep.learnMoreItem = [self.learnMoreItem copy];
-    questionStep.question = [self.question copy];
-    questionStep.tagText = [self.tagText copy];
     return questionStep;
 }
 
@@ -115,13 +93,11 @@
     __typeof(self) castObject = object;
     return isParentSame &&
     ORKEqualObjects(self.answerFormat, castObject.answerFormat) &&
-    ORKEqualObjects(self.placeholder, castObject.placeholder) &&
-    ORKEqualObjects(self.learnMoreItem, castObject.learnMoreItem) &&
-    ORKEqualObjects(self.tagText, castObject.tagText);
+    ORKEqualObjects(self.placeholder, castObject.placeholder);
 }
 
 - (NSUInteger)hash {
-    return super.hash ^ self.answerFormat.hash ^ self.question.hash ^ self.questionType ^ self.placeholder.hash ^ (_useCardView ? 0xf : 0x0) ^ self.learnMoreItem.hash ^ self.tagText.hash;
+    return super.hash ^ self.answerFormat.hash;
 }
 
 - (void)setQuestion:(NSString *)question {
@@ -142,10 +118,6 @@
     if (self) {
         ORK_DECODE_OBJ_CLASS(aDecoder, answerFormat, ORKAnswerFormat);
         ORK_DECODE_OBJ_CLASS(aDecoder, placeholder, NSString);
-        ORK_DECODE_OBJ_CLASS(aDecoder, question, NSString);
-        ORK_DECODE_OBJ_CLASS(aDecoder, learnMoreItem, ORKLearnMoreItem);
-        ORK_DECODE_BOOL(aDecoder, useCardView);
-        ORK_DECODE_OBJ_CLASS(aDecoder, tagText, NSString);
     }
     return self;
 }
@@ -155,10 +127,6 @@
     
     ORK_ENCODE_OBJ(aCoder, answerFormat);
     ORK_ENCODE_OBJ(aCoder, placeholder);
-    ORK_ENCODE_OBJ(aCoder, question);
-    ORK_ENCODE_OBJ(aCoder, learnMoreItem);
-    ORK_ENCODE_BOOL(aCoder, useCardView);
-    ORK_ENCODE_OBJ(aCoder, tagText);
 }
 
 + (BOOL)supportsSecureCoding {

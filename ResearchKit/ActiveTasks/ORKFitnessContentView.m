@@ -226,7 +226,7 @@
                                                                                       toItem:nil
                                                                                    attribute:NSLayoutAttributeNotAnAttribute
                                                                                   multiplier:1.0
-                                                                                    constant:CGFLOAT_MIN];
+                                                                                    constant:ORKScreenMetricMaxDimension];
     imageSpacerHeightConstraint.priority = UILayoutPriorityDefaultLow - 1;
     [constraints addObject:imageSpacerHeightConstraint];
     

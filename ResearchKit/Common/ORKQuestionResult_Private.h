@@ -51,7 +51,7 @@ NS_ASSUME_NONNULL_BEGIN
 - (instancetype)initWithCoordinate:(CLLocationCoordinate2D)coordinate
                             region:(nullable CLCircularRegion *)region
                          userInput:(nullable NSString *)userInput
-                     postalAddress:(nullable CNPostalAddress *)postalAddress;
+                 addressDictionary:(nullable NSDictionary *)addressDictionary;
 
 - (instancetype)initWithPlacemark:(CLPlacemark *)placemark userInput:(NSString *)userInput;
 

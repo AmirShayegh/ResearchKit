@@ -35,7 +35,9 @@
 
 #import "ORKHelpers_Internal.h"
 #import "ORKSkin.h"
+
 #import <WebKit/WebKit.h>
+#import "WKWebView+ResearchKit.h"
 
 
 @interface ORKConsentLearnMoreViewController () <WKNavigationDelegate>
@@ -70,9 +72,8 @@
     [super viewDidLoad];
     
     self.view.backgroundColor = ORKColor(ORKBackgroundColorKey);
-  
-    WKWebViewConfiguration *webViewConfiguration = [WKWebViewConfiguration new];
-    _webView = [[WKWebView alloc] initWithFrame:self.view.bounds configuration:webViewConfiguration];
+    
+    _webView = [WKWebView createResearchKitWebViewWith:self.view.frame];
     
     const CGFloat horizMargin = ORKStandardLeftMarginForTableViewCell(self.view);
     _webView.backgroundColor = ORKColor(ORKBackgroundColorKey);
@@ -83,15 +84,15 @@
     _webView.scrollView.scrollIndicatorInsets = (UIEdgeInsets){.left = -horizMargin, .right = -horizMargin};
     _webView.opaque = NO; // If opaque is set to YES, _webView shows a black right margin during transition when modally presented. This is an artifact due to disabling clipsToBounds to be able to show the scroll indicator outside the view.
     
-    
-    _webView.navigationDelegate = self;
-    
     if (_contentURL) {
+//        [_webView setScalesPageToFit:YES];
+        
         [_webView loadRequest:[NSURLRequest requestWithURL:_contentURL]];
     } else {
         [_webView loadHTMLString:self.content baseURL:ORKCreateRandomBaseURL()];
     }
     
+    _webView.navigationDelegate = self;
     [self.view addSubview:_webView];
     
     _webView.translatesAutoresizingMaskIntoConstraints = NO;
@@ -121,14 +122,12 @@
     [self.presentingViewController dismissViewControllerAnimated:YES completion:nil];
 }
 
-- (void)webView:(WKWebView *) __unused webView decidePolicyForNavigationAction:(WKNavigationAction *)navigationAction decisionHandler:(void (^)(WKNavigationActionPolicy))decisionHandler {
+- (void)webView:(WKWebView *)webView decidePolicyForNavigationAction:(WKNavigationAction *)navigationAction decisionHandler:(void (^)(WKNavigationActionPolicy))decisionHandler {
     if (navigationAction.navigationType != WKNavigationTypeOther) {
-        [[UIApplication sharedApplication] openURL:navigationAction.request.URL options:@{} completionHandler:^(BOOL __unused success) {
-            decisionHandler(WKNavigationActionPolicyCancel);
-        }];
-    } else {
-        decisionHandler(WKNavigationActionPolicyAllow);
+        [[UIApplication sharedApplication] openURL:webView.URL options:@{} completionHandler:nil];
+        decisionHandler(WKNavigationActionPolicyCancel);
     }
+    decisionHandler(WKNavigationActionPolicyAllow);
 }
 
 @end

@@ -47,9 +47,11 @@
     
     ORKPasscodeStep *step = [[ORKPasscodeStep alloc] initWithIdentifier:identifier];
     step.passcodeFlow = passcodeFlow;
-    step.showsProgress = NO;
-    step.useBiometrics = YES;
     return step;
+}
+
+- (BOOL)showsProgress {
+    return NO;
 }
 
 - (instancetype)initWithCoder:(NSCoder *)aDecoder {
@@ -57,7 +59,6 @@
     if (self) {
         ORK_DECODE_INTEGER(aDecoder, passcodeType);
         ORK_DECODE_ENUM(aDecoder, passcodeFlow);
-        ORK_DECODE_BOOL(aDecoder, useBiometrics);
     }
     return self;
 }
@@ -66,7 +67,6 @@
     [super encodeWithCoder:aCoder];
     ORK_ENCODE_INTEGER(aCoder, passcodeType);
     ORK_ENCODE_ENUM(aCoder, passcodeFlow);
-    ORK_ENCODE_BOOL(aCoder, useBiometrics);
 }
 
 + (BOOL)supportsSecureCoding {
@@ -77,7 +77,6 @@
     ORKPasscodeStep *step = [super copyWithZone:zone];
     step.passcodeType = self.passcodeType;
     step.passcodeFlow = self.passcodeFlow;
-    step.useBiometrics = self.useBiometrics;
     return step;
 }
 
@@ -87,8 +86,7 @@
     __typeof(self) castObject = object;
     return (isParentSame &&
             self.passcodeFlow == castObject.passcodeFlow &&
-            self.passcodeType == castObject.passcodeType &&
-            self.useBiometrics == castObject.useBiometrics);
+            self.passcodeType == castObject.passcodeType);
 }
 
 @end

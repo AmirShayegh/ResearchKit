@@ -71,14 +71,13 @@ ORK_CLASS_AVAILABLE
  
  Subclasses must implement this method to calculate the next step based on the passed task result.
  The `ORKNullStepIdentifier` constant can be returned to indicate that the ongoing task should end
- after the step navigation rule is triggered. Returning `nil` makes the task to go to the next
- contiguous step.
+ after the step navigation rule is triggered.
  
  @param taskResult      The up-to-date task result, used for calculating the destination step.
  
  @return The identifier of the destination step.
  */
-- (nullable NSString *)identifierForDestinationStepWithTaskResult:(ORKTaskResult *)taskResult;
+- (NSString *)identifierForDestinationStepWithTaskResult:(ORKTaskResult *)taskResult;
 
 @end
 
@@ -253,11 +252,12 @@ ORK_CLASS_AVAILABLE
  step navigation rules to be triggered before a task step is shown. Each step can have one skip rule
  at most.
  
- Subclasses must implement the `stepShouldSkipWithTaskResult:` method, which returns whether the
- step should be skipped.
+ Subclasses must implement the `identifierForDestinationStepWithTaskResult:` method, which returns
+ the identifier of the destination step for the rule.
  
- A concrete subclass is included: `ORKPredicateSkipStepNavigationRule`, which will skip the step
- if the results of the ongoing task match the provided `resultPredicate`.
+ Two concrete subclasses are included: `ORKPredicateStepNavigationRule` can match any answer
+ combination in the results of the ongoing task and jump accordingly; `ORKDirectStepNavigationRule`
+ unconditionally navigates to the step specified by the destination step identifier.
  */
 ORK_CLASS_AVAILABLE
 @interface ORKSkipStepNavigationRule : NSObject <NSCopying, NSSecureCoding>
@@ -396,6 +396,7 @@ ORK_CLASS_AVAILABLE
 /**
  Returns a new step modifier.
  
+ @param stepIdentifier    The step identifier for the step to modify
  @param resultPredicate   The result predicate to use to determine if the step should be modified
  @param keyValueMap       The mapping dictionary for this object
  @return                  A new step modifier
