@@ -1,21 +1,21 @@
 /*
  Copyright (c) 2015, Apple Inc. All rights reserved.
- 
+
  Redistribution and use in source and binary forms, with or without modification,
  are permitted provided that the following conditions are met:
- 
+
  1.  Redistributions of source code must retain the above copyright notice, this
  list of conditions and the following disclaimer.
- 
+
  2.  Redistributions in binary form must reproduce the above copyright notice,
  this list of conditions and the following disclaimer in the documentation and/or
  other materials provided with the distribution.
- 
+
  3.  Neither the name of the copyright holder(s) nor the names of any contributors
  may be used to endorse or promote products derived from this software without
  specific prior written permission. No license is granted to the trademarks of
  the copyright holders even if such marks are included in this software.
- 
+
  THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS"
  AND ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE
  IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE
@@ -490,12 +490,18 @@
 "TREMOR_SKIP_NEITHER" = "I can perform this activity with both hands.";
 
 /* Trail making task. */
-"TRAILMAKING_TASK_TITLE" = "Trail Making Test";
-"TRAILMAKING_INTENDED_USE" = "This activity evaluates your visual attention and task switching by recording the time required to tap a series of dots in order.";
-"TRAILMAKING_INTENDED_USE2_A" = "After the countdown, tap dots in alternating order between numbers and letters. Begin by tapping the first number '1' followed by the numbers '2' – '3' – '4'… until you reach the number '7'.";
-"TRAILMAKING_INTENDED_USE2_B" = "After the countdown, tap dots in alternating order between numbers and letters. Begin by tapping the first number '1' followed by tapping the first letter 'A', and then '2' – 'B' – '3' – 'C'… until you reach the number '7'.";
-"TRAILMAKING_INTRO_TEXT" = "Do this as quickly as you can without making mistakes. \n ";
+"TRAILMAKING_TASK_TITLE_A" = "Trail Making A";
+"TRAILMAKING_INTENDED_USE_A" = "You will see numbers in circles on the next screen. Please tap from one number to the next, in order. Begin by tapping on ‘1’, then tap on ‘2’, then on ‘3’ and so on until you reach the number ‘13’.";
+"TRAILMAKING_INTENDED_USE2_A" = "When the correct circle is tapped, a line will connect it to the previous number. When an incorrect circle is tapped, it will turn red and no line will appear. You will then have to tap the correct circle in order to continue the task.";
+"TRAILMAKING_INTRO_TEXT_A" = "Please work as quickly and accurately as you can. The task will end when you’ve correctly connected all of the numbers in order up until number, 13.\n\n";
+
+"TRAILMAKING_TASK_TITLE_B" = "Trail Making B";
+"TRAILMAKING_INTENDED_USE_B" = "You will see numbers and letters in circles on the screen. Please tap the circles alternating in order between numbers and letters. Begin by tapping number ‘1’, then tap the first letter, ‘A’, then tap the next number, ‘2’, and then the next letter, ‘B’ – ‘3’ – ‘C’… until you reach the number ‘7’.";
+"TRAILMAKING_INTENDED_USE2_B" = "When the correct circle is tapped, a line will connect it to the previous number or letter. When an incorrect circle is tapped, it will turn red and no line will appear. You will then have to tap on the correct circle in order to continue the task.";
+"TRAILMAKING_INTRO_TEXT_B" = "Please work as quickly and accurately as you can. The task will end when you’ve correctly connected all of the numbers and letters in order up until number, 7.\n\n";
+
 "TRAILMAKING_CALL_TO_ACTION" = "Tap Get Started to begin.";
+
 "TRAILMAKING_TIMER" = "%.1f s";
 "TRAILMAKING_ERROR" = "%@ (%d error)";
 "TRAILMAKING_ERROR_PLURAL" = "%@ (%d errors)";
@@ -546,7 +552,7 @@
 "AX_IMAGE_CAPTURED_LABEL" = "Captured image";
 
 "AX_VIDEO_CAPTURE_LABEL" = "Video capture preview";
-"AX_VIDEO_CAPTURE_COMPLETE" = "Video capture complete"; 
+"AX_VIDEO_CAPTURE_COMPLETE" = "Video capture complete";
 
 "AX_TOWER_OF_HANOI_INVALID_MOVE_FORMAT" = "Unable to place disk with size %@ on disk with size %@";
 "AX_TOWER_OF_HANOI_TARGET_DISK" = "Target";
